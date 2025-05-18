@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/add_budget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fitsSystemWindows="true"
+    tools:context=".AddBudgetActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/title_add_budget" 
+            app:titleTextColor="@color/white"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/activity_margin"
+            android:paddingBottom="@dimen/activity_margin">
+
+            <!-- Category and Amount Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_budget_info"
+                style="@style/CardStyle.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_medium">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/text_budget_info_title"
+                        style="@style/TextSubheading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Budget Details"
+                        android:textColor="@color/primary"
+                        android:layout_marginBottom="@dimen/spacing_medium" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layout_category"
+                        style="@style/InputLayout.Filled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/label_category"
+                        app:startIconDrawable="@drawable/ic_category"
+                        app:startIconTint="@color/primary"
+                        app:helperText="e.g. Groceries, Rent, Entertainment">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_budget_category"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layout_amount"
+                        style="@style/InputLayout.Filled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/label_amount"
+                        app:startIconDrawable="@drawable/ic_peso"
+                        app:startIconTint="@color/primary"
+                        app:prefixText="₱"
+                        app:helperText="Maximum amount allocated for this budget">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_budget_amount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            
+            <!-- Time Period Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_budget_period"
+                style="@style/CardStyle.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_medium">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/text_date_range_label"
+                        style="@style/TextSubheading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_budget_period"
+                        android:textColor="@color/primary"
+                        android:layout_marginBottom="@dimen/spacing_medium" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/spinner_layout"
+                        style="@style/InputLayout.Dropdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/label_budget_type"
+                        app:startIconDrawable="@drawable/ic_schedule"
+                        app:startIconTint="@color/primary">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/spinner_period"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none"
+                            android:labelFor="@id/spinner_layout"
+                            android:padding="@dimen/spacing_medium"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/spacing_small">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/layout_start_date"
+                            style="@style/InputLayout.Filled"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="@dimen/spacing_small"
+                            android:hint="@string/label_start_date"
+                            app:startIconDrawable="@drawable/ic_calendar"
+                            app:startIconTint="@color/primary">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_start_date"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="false"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/layout_end_date"
+                            style="@style/InputLayout.Filled"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/spacing_small"
+                            android:hint="@string/label_end_date"
+                            app:startIconDrawable="@drawable/ic_calendar"
+                            app:startIconTint="@color/primary">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_end_date"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="false"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            
+            <TextView
+                android:id="@+id/text_budget_tips"
+                style="@style/TextBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:layout_marginBottom="@dimen/spacing_xlarge"
+                android:background="@color/primary_light"
+                android:padding="@dimen/spacing_medium"
+                android:text="Tip: Creating specific budgets for different categories helps you track and manage your expenses more effectively."
+                android:textColor="@color/primary_dark"
+                android:textStyle="italic" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_save_budget"
+                style="@style/ButtonPrimary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/save"
+                app:icon="@drawable/ic_save"
+                app:iconGravity="textStart" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout> 
