@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/savings_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fitsSystemWindows="true"
+    tools:context=".SavingsActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="My Savings" 
+            app:titleTextColor="@color/white"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/activity_margin"
+            android:paddingBottom="@dimen/activity_margin">
+
+            <!-- Savings Summary Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_savings_summary"
+                style="@style/CardStyle.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_medium">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/text_savings_title"
+                        style="@style/TextSubheading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Savings Overview"
+                        android:textColor="@color/primary"
+                        android:layout_marginBottom="@dimen/spacing_medium" />
+
+                    <!-- Total Savings -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="@dimen/spacing_medium">
+                        
+                        <ImageView
+                            android:layout_width="@dimen/icon_size_medium"
+                            android:layout_height="@dimen/icon_size_medium"
+                            android:src="@drawable/ic_peso"
+                            android:tint="@color/income"
+                            android:layout_marginEnd="@dimen/spacing_small" />
+                            
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Total Savings"
+                                android:textSize="@dimen/text_size_body"
+                                android:textColor="@color/text_secondary" />
+                                
+                            <TextView
+                                android:id="@+id/text_total_savings_amount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="@dimen/text_size_title"
+                                android:textColor="@color/income"
+                                android:textStyle="bold"
+                                tools:text="₱25,000.00" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Overall Progress -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Overall Progress"
+                        android:textSize="@dimen/text_size_body"
+                        android:textColor="@color/text_secondary" />
+
+                    <ProgressBar
+                        android:id="@+id/progress_overall_savings"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_tiny"
+                        android:progressTint="@color/income"
+                        android:max="100"
+                        tools:progress="45" />
+
+                    <TextView
+                        android:id="@+id/text_overall_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:textSize="@dimen/text_size_caption"
+                        android:textColor="@color/text_secondary"
+                        tools:text="₱25,000 / ₱55,000 (45.5%)" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            
+            <!-- Upcoming Goals Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Upcoming Goals"
+                android:textSize="@dimen/text_size_subheading"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:layout_marginBottom="@dimen/spacing_small" />
+                
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_upcoming_goals"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_savings_goal"
+                tools:itemCount="3" />
+                
+            <!-- All Savings Goals -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="@dimen/spacing_large"
+                android:layout_marginBottom="@dimen/spacing_small">
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="All Savings Goals"
+                    android:textSize="@dimen/text_size_subheading"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold" />
+                    
+                <TextView
+                    android:id="@+id/text_completed_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_caption"
+                    android:textColor="@color/text_secondary"
+                    tools:text="3 Completed" />
+            </LinearLayout>
+                
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_savings_goals"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_savings_goal"
+                tools:itemCount="5" />
+                
+            <!-- Empty State View -->
+            <LinearLayout
+                android:id="@+id/empty_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:contentDescription="Empty savings goals"
+                    android:src="@drawable/ic_launcher_foreground"
+                    android:tint="#CCCCCC" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_medium"
+                    android:text="No savings goals yet"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_small"
+                    android:gravity="center"
+                    android:text="Set savings goals to help you save for things you want"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Confetti animation view for celebrations -->
+    <com.example.personifi.ConfettiView
+        android:id="@+id/confetti_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_savings_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/spacing_medium"
+        android:contentDescription="Add a new savings goal"
+        android:src="@drawable/ic_add"
+        app:tint="@color/white"
+        app:backgroundTint="@color/primary" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout> 
