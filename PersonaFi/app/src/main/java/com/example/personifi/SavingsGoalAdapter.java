@@ -763,16 +763,16 @@ public class SavingsGoalAdapter extends ListAdapter<SavingsGoal, SavingsGoalAdap
                 switch (goalPeriodMode) {
                     case 0: // Daily
                         displayAmount = remainingAmount / 30; // Spread over 30 days
-                        periodLabel = "Daily (Overdue)";
+                        periodLabel = "Daily";
                         break;
                     case 1: // Weekly
                         displayAmount = remainingAmount / 4; // Spread over 4 weeks
-                        periodLabel = "Weekly (Overdue)";
+                        periodLabel = "Weekly";
                         break;
                     case 2: // Monthly (default)
                     default:
                         displayAmount = remainingAmount; // Complete within a month
-                        periodLabel = "This Month (Overdue)";
+                        periodLabel = "Monthly";
                         break;
                 }
             } else {
@@ -785,11 +785,10 @@ public class SavingsGoalAdapter extends ListAdapter<SavingsGoal, SavingsGoalAdap
                         if (fullDays <= 1) {
                             // If it's exactly one day or less, show the full remaining amount
                             displayAmount = remainingAmount;
-                            periodLabel = "Today";
                         } else {
                             displayAmount = regularDailyAmount;
-                            periodLabel = "Daily";
                         }
+                        periodLabel = "Daily";
                         break;
                         
                     case 1: // Weekly
@@ -799,7 +798,6 @@ public class SavingsGoalAdapter extends ListAdapter<SavingsGoal, SavingsGoalAdap
                         if (isExactWeeks) {
                             // If it's exactly X weeks, divide target amount equally
                             displayAmount = targetAmount / Math.round(totalWeeks);
-                            periodLabel = "Weekly";
                         } else {
                             double regularWeeklyAmount = goal.getWeeklyAmount();
                             int fullWeeks = (int) Math.ceil(totalWeeks);
@@ -807,12 +805,11 @@ public class SavingsGoalAdapter extends ListAdapter<SavingsGoal, SavingsGoalAdap
                             if (fullWeeks <= 1) {
                                 // If it's less than or exactly one week, show the full remaining amount
                                 displayAmount = remainingAmount;
-                                periodLabel = "This Week";
                             } else {
                                 displayAmount = regularWeeklyAmount;
-                                periodLabel = "Weekly";
                             }
                         }
+                        periodLabel = "Weekly";
                         break;
                         
                     case 2: // Monthly (default)
@@ -823,7 +820,6 @@ public class SavingsGoalAdapter extends ListAdapter<SavingsGoal, SavingsGoalAdap
                         if (isExactMonths) {
                             // If it's exactly X months, divide target amount equally
                             displayAmount = targetAmount / Math.round(totalMonths);
-                            periodLabel = "Monthly";
                         } else {
                             double regularMonthlyAmount = goal.getMonthlyAmount();
                             int fullMonths = (int) Math.ceil(totalMonths);
@@ -831,56 +827,24 @@ public class SavingsGoalAdapter extends ListAdapter<SavingsGoal, SavingsGoalAdap
                             if (fullMonths <= 1) {
                                 // If it's less than or exactly one month, show the full remaining amount
                                 displayAmount = remainingAmount;
-                                periodLabel = "This Month";
                             } else {
                                 displayAmount = regularMonthlyAmount;
-                                periodLabel = "Monthly";
                             }
                         }
+                        periodLabel = "Monthly";
                         break;
                 }
             }
             
-            // Combine amount and period into single text
-            String displayText;
+            // Display amount with simple period label
             if (displayAmount > 0 && !Double.isInfinite(displayAmount) && !Double.isNaN(displayAmount)) {
-                displayText = String.format("%s %s", formatCurrency(displayAmount), periodLabel);
+                String displayText = String.format("%s %s", formatCurrency(displayAmount), periodLabel);
+                textMonthlyRecommended.setText(displayText);
+                textMonthlyRecommended.setTextColor(itemView.getContext().getResources().getColor(R.color.text_secondary));
             } else {
-                displayText = isOverdue ? "Overdue" : "Set a goal";
+                textMonthlyRecommended.setText("Set a goal");
+                textMonthlyRecommended.setTextColor(itemView.getContext().getResources().getColor(R.color.text_secondary));
             }
-            
-            textMonthlyRecommended.setText(displayText);
-            textMonthlyRecommended.setTextColor(itemView.getContext().getResources().getColor(
-                isOverdue ? R.color.expense : R.color.text_secondary
-            ));
-            
-            // Log the calculation for debugging
-            android.util.Log.d("SavingsGoalAdapter", String.format(
-                "Goal Progress for %s:\n" +
-                "Target Amount: %.2f\n" +
-                "Current Amount: %.2f\n" +
-                "Remaining Amount: %.2f\n" +
-                "Total Days: %.2f\n" +
-                "Total Weeks: %.2f\n" +
-                "Total Months: %.2f\n" +
-                "Is Exact Weeks: %b\n" +
-                "Is Exact Months: %b\n" +
-                "Is Overdue: %b\n" +
-                "Display Amount: %.2f\n" +
-                "Period: %s",
-                goal.getName(),
-                targetAmount,
-                currentAmount,
-                remainingAmount,
-                totalDays,
-                totalWeeks,
-                totalMonths,
-                Math.abs(Math.round(totalWeeks) - totalWeeks) < 0.1,
-                Math.abs(Math.round(totalMonths) - totalMonths) < 0.1,
-                isOverdue,
-                displayAmount,
-                periodLabel
-            ));
         }
 
         // Method to restore the saved period mode for this specific goal
@@ -937,30 +901,26 @@ public class SavingsGoalAdapter extends ListAdapter<SavingsGoal, SavingsGoalAdap
                                 break;
                             case 1:  // Add Funds / Edit Goal
                                 if (goal.isCompleted()) {
-                                    if (context instanceof SavingsFragment) {
-                                        ((SavingsFragment) context).showEditSavingsGoalDialog(goal);
-                                    }
-                                } else {
-                                    // Show add funds dialog
-                                    if (context instanceof Activity) {
-                                        Activity activity = (Activity) context;
-                                        ViewModelProvider provider = new ViewModelProvider((ViewModelStoreOwner) activity);
-                                        SavingsViewModel viewModel = provider.get(SavingsViewModel.class);
-                                        showAddFundsDialog(goal, anchorView, viewModel);
-                                    }
+                                    // TODO: Implement edit goal functionality
+                                    break;
+                                }
+                                // Show add funds dialog
+                                if (context instanceof Activity) {
+                                    Activity activity = (Activity) context;
+                                    ViewModelProvider provider = new ViewModelProvider((ViewModelStoreOwner) activity);
+                                    SavingsViewModel viewModel = provider.get(SavingsViewModel.class);
+                                    showAddFundsDialog(goal, anchorView, viewModel);
                                 }
                                 break;
                             case 2:  // Withdraw Funds / Delete Goal
                                 if (goal.isCompleted()) {
                                     confirmDeleteGoal(goal, context);
-                                } else {
-                                    showWithdrawFundsDialog(goal, anchorView);
+                                    break;
                                 }
+                                showWithdrawFundsDialog(goal, anchorView);
                                 break;
                             case 3:  // Edit Goal
-                                if (context instanceof SavingsFragment) {
-                                    ((SavingsFragment) context).showEditSavingsGoalDialog(goal);
-                                }
+                                // TODO: Implement edit goal functionality
                                 break;
                             case 4:  // Mark as Completed
                                 if (context instanceof Activity) {

@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 import com.example.personifi.TimeConstants;
+import com.example.personifi.utils.TimeUtils;
 
 /**
  * Entity representing a savings goal in the PersoniFi app.
@@ -223,53 +224,24 @@ public class SavingsGoal {
             return 0;
         }
         
-        // Calculate time remaining from current date to target date
+        // Get current date
         Date currentDate = new Date();
         
-        // Fix potential time zone or time issues by comparing only the date components
-        Calendar targetCal = Calendar.getInstance();
-        targetCal.setTime(targetDate);
-        // Reset time to beginning of day to avoid time zone issues
-        targetCal.set(Calendar.HOUR_OF_DAY, 0);
-        targetCal.set(Calendar.MINUTE, 0);
-        targetCal.set(Calendar.SECOND, 0);
-        targetCal.set(Calendar.MILLISECOND, 0);
+        // Check if goal is overdue
+        boolean isOverdue = TimeUtils.isDateInPast(targetDate);
         
-        Calendar currentCal = Calendar.getInstance();
-        currentCal.setTime(currentDate);
-        // Reset time to beginning of day to avoid time zone issues
-        currentCal.set(Calendar.HOUR_OF_DAY, 0);
-        currentCal.set(Calendar.MINUTE, 0);
-        currentCal.set(Calendar.SECOND, 0);
-        currentCal.set(Calendar.MILLISECOND, 0);
+        // Calculate periods remaining
+        this.totalDays = TimeUtils.getPeriodsRemaining(currentDate, targetDate, 0);
+        this.totalWeeks = TimeUtils.getPeriodsRemaining(currentDate, targetDate, 1);
+        this.totalMonths = TimeUtils.getPeriodsRemaining(currentDate, targetDate, 2);
         
-        // If target date is in the past, assume immediate goal (1 month)
-        if (targetCal.before(currentCal)) {
-            this.totalDays = 1;
-            this.totalWeeks = 1.0/7.0;
-            this.totalMonths = 1.0/30.436875;
-            this.dailyAmount = targetAmount;
-            this.weeklyAmount = targetAmount;
-            this.monthlyAmount = targetAmount;
-            return targetAmount;
-        }
+        // Calculate required amounts
+        double remainingAmount = getRemainingAmount();
         
-        // Calculate the exact number of days between dates
-        long diffInMillis = targetCal.getTimeInMillis() - currentCal.getTimeInMillis();
-        this.totalDays = diffInMillis / (1000.0 * 60 * 60 * 24);
-        
-        // Calculate exact number of weeks (totalDays / 7)
-        this.totalWeeks = this.totalDays / 7.0;
-        
-        // Calculate exact number of months
-        // We'll use the exact number of days divided by average days in a month
-        this.totalMonths = this.totalDays / 30.436875; // Using astronomical year (365.2425/12)
-        
-        // Calculate the required amounts for each period using target amount
-        // This ensures the amounts stay fixed regardless of current savings
-        this.dailyAmount = targetAmount / this.totalDays;
-        this.weeklyAmount = targetAmount / this.totalWeeks;
-        this.monthlyAmount = targetAmount / this.totalMonths;
+        // Calculate amounts per period
+        this.dailyAmount = TimeUtils.calculateAmountPerPeriod(remainingAmount, totalDays, isOverdue);
+        this.weeklyAmount = TimeUtils.calculateAmountPerPeriod(remainingAmount, totalWeeks, isOverdue);
+        this.monthlyAmount = TimeUtils.calculateAmountPerPeriod(remainingAmount, totalMonths, isOverdue);
         
         // Log calculation details for debugging
         android.util.Log.d("SavingsGoal", String.format(
@@ -280,9 +252,11 @@ public class SavingsGoal {
             "Total Weeks: %.2f\n" +
             "Total Months: %.2f\n" +
             "Target Amount: %.2f\n" +
+            "Remaining Amount: %.2f\n" +
             "Daily Required: %.2f\n" +
             "Weekly Required: %.2f\n" +
-            "Monthly Required: %.2f",
+            "Monthly Required: %.2f\n" +
+            "Is Overdue: %b",
             this.name,
             new java.text.SimpleDateFormat("yyyy-MM-dd").format(targetDate),
             new java.text.SimpleDateFormat("yyyy-MM-dd").format(currentDate),
@@ -290,9 +264,11 @@ public class SavingsGoal {
             this.totalWeeks,
             this.totalMonths,
             targetAmount,
+            remainingAmount,
             this.dailyAmount,
             this.weeklyAmount,
-            this.monthlyAmount
+            this.monthlyAmount,
+            isOverdue
         ));
         
         return this.monthlyAmount;

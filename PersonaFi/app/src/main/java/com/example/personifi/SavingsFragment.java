@@ -44,6 +44,7 @@ import com.example.personifi.ConfettiView;
 import com.example.personifi.AnimatedShapesView;
 import com.example.personifi.utils.ToastUtils;
 import com.example.personifi.TimeConstants;
+import com.example.personifi.utils.TimeUtils;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -496,230 +497,85 @@ public class SavingsFragment extends Fragment {
         // Update progress bar with single animation to avoid flickering
         circularProgressOverallSavings.setProgress(progress);
         
-        // Get all savings goals to find the longest target date
-        List<SavingsGoal> allGoals = savingsViewModel.getAllSavingsGoals().getValue();
-        Date longestTargetDate = null;
-        SavingsGoal singleGoal = null;
-        
-        if (allGoals != null && !allGoals.isEmpty()) {
-            // If there's only one goal, use its exact amounts
-            if (allGoals.size() == 1) {
-                singleGoal = allGoals.get(0);
-            }
-            
-            // Find longest target date among incomplete goals
-            Date now = new Date();
-            for (SavingsGoal goal : allGoals) {
-                if (!goal.isCompleted() && goal.getTargetDate() != null) {
-                    // If the target date has passed but goal isn't complete, use today + 1 month
-                    if (goal.getTargetDate().before(now)) {
-                        Calendar cal = Calendar.getInstance();
-                        cal.add(Calendar.MONTH, 1);
-                        Date adjustedDate = cal.getTime();
-                        if (longestTargetDate == null || adjustedDate.after(longestTargetDate)) {
-                            longestTargetDate = adjustedDate;
-                        }
-                    } else {
-                        if (longestTargetDate == null || goal.getTargetDate().after(longestTargetDate)) {
-                            longestTargetDate = goal.getTargetDate();
-                        }
-                    }
-                }
-            }
-            
-            // If all target dates have passed but there are incomplete goals,
-            // set target date to 1 month from now
-            if (longestTargetDate == null && !allGoals.stream().allMatch(SavingsGoal::isCompleted)) {
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.MONTH, 1);
-                longestTargetDate = cal.getTime();
-            }
-        }
-        
-        // Calculate time periods based on longest target date
-        double totalDays = 0;
-        double totalWeeks = 0;
-        double totalMonths = 0;
-        
-        if (longestTargetDate != null) {
-            Date now = new Date();
-            long diffInMillis = longestTargetDate.getTime() - now.getTime();
-            totalDays = Math.max(1, diffInMillis / (1000.0 * 60 * 60 * 24)); // Minimum 1 day
-            totalWeeks = Math.max(0.143, totalDays / 7.0); // Minimum ~1 day
-            totalMonths = Math.max(0.0333, totalDays / TimeConstants.DAYS_IN_MONTH); // Minimum ~1 day
-        }
-        
-        // Calculate remaining amount needed
-        double remainingAmount = Math.max(0, targetSavings - currentSavings);
-        
-        // Calculate savings amounts for each period
-        double displayAmount = 0;
-        String periodLabel = "Monthly"; // Default to Monthly
-        
-        // Only calculate if we have valid data
-        if (targetSavings > 0 && longestTargetDate != null) {
-            // If there's only one goal, use its exact calculation methods
-            if (singleGoal != null && !singleGoal.isCompleted()) {
-                switch (goalPeriodMode) {
-                    case 0: // Daily
-                        if (singleGoal.getTargetDate().before(new Date())) {
-                            // Target date passed, suggest completing it within a month
-                            displayAmount = remainingAmount / Math.min(30, totalDays);
-                        } else {
-                            displayAmount = singleGoal.getDailyAmount();
-                        }
-                        periodLabel = totalDays <= 1 ? "Today" : "Daily";
-                        break;
-                        
-                    case 1: // Weekly
-                        if (singleGoal.getTargetDate().before(new Date())) {
-                            // Target date passed, suggest completing it within a month
-                            displayAmount = remainingAmount / Math.min(4, totalWeeks);
-                        } else {
-                            displayAmount = singleGoal.getWeeklyAmount();
-                        }
-                        periodLabel = totalWeeks <= 1 ? "This Week" : "Weekly";
-                        break;
-                        
-                    case 2: // Monthly (default)
-                    default:
-                        if (singleGoal.getTargetDate().before(new Date())) {
-                            // Target date passed, suggest completing it within a month
-                            displayAmount = remainingAmount;
-                        } else {
-                            displayAmount = singleGoal.getMonthlyAmount();
-                        }
-                        periodLabel = totalMonths <= 1 ? "This Month" : "Monthly";
-                        break;
-                }
-            } else {
-                // Multiple goals or no goals - use the combined calculation
-                switch (goalPeriodMode) {
-                    case 0: // Daily
-                        if (totalDays <= 1) {
-                            displayAmount = remainingAmount;
-                            periodLabel = "Today";
-                        } else {
-                            // Calculate fixed daily amount
-                            int fullDays = (int) Math.ceil(totalDays); // Use ceil instead of floor
-                            if (fullDays > 0) {
-                                displayAmount = remainingAmount / fullDays;
-                                periodLabel = "Daily";
-                            }
-                        }
-                        break;
-                        
-                    case 1: // Weekly
-                        // Check if it's an exact number of weeks (allowing for small decimal differences)
-                        boolean isExactWeeks = Math.abs(Math.round(totalWeeks) - totalWeeks) < 0.1;
-                        
-                        if (isExactWeeks && totalWeeks > 0) {
-                            // If it's exactly X weeks, divide target amount equally
-                            displayAmount = targetSavings / Math.round(totalWeeks);
-                            periodLabel = "Weekly";
-                        } else {
-                            double regularWeeklyAmount = totalWeeks > 0 ? remainingAmount / Math.ceil(totalWeeks) : remainingAmount;
-                            int fullWeeks = (int) Math.ceil(totalWeeks);
-                            
-                            if (fullWeeks <= 1) {
-                                displayAmount = remainingAmount;
-                                periodLabel = "This Week";
-                            } else {
-                                displayAmount = regularWeeklyAmount;
-                                periodLabel = "Weekly";
-                            }
-                        }
-                        break;
-                        
-                    case 2: // Monthly (default)
-                    default:
-                        // Check if it's an exact number of months (allowing for small decimal differences)
-                        boolean isExactMonths = Math.abs(Math.round(totalMonths) - totalMonths) < 0.1;
-                        
-                        if (isExactMonths && totalMonths > 0) {
-                            // If it's exactly X months, divide target amount equally
-                            displayAmount = targetSavings / Math.round(totalMonths);
-                            periodLabel = "Monthly";
-                        } else {
-                            double regularMonthlyAmount = totalMonths > 0 ? remainingAmount / Math.ceil(totalMonths) : remainingAmount;
-                            int fullMonths = (int) Math.ceil(totalMonths);
-                            
-                            if (fullMonths <= 1) {
-                                displayAmount = remainingAmount;
-                                periodLabel = "This Month";
-                            } else {
-                                displayAmount = regularMonthlyAmount;
-                                periodLabel = "Monthly";
-                            }
-                        }
-                        break;
-                }
-            }
-        }
-        
-        // Update textual information - show 0 values if no goals
-        if (targetSavings == 0) {
-            textOverallProgress.setText("₱0 / ₱0");
-            textOverallPercentage.setText("0%");
+        // Get all savings goals to find the latest target date
+        List<SavingsGoal> goals = savingsViewModel.getAllSavingsGoals().getValue();
+        if (goals == null || goals.isEmpty()) {
+            // No goals, clear all amounts
             textMonthlySavingsGoal.setText("Set a goal");
             textMonthlySavingsGoal.setTextColor(getResources().getColor(R.color.primary));
-        } else {
-            textOverallProgress.setText(String.format("%s / %s", 
-                    "₱" + CircularProgressView.formatLargeNumber(currentSavings), 
-                    "₱" + CircularProgressView.formatLargeNumber(targetSavings)));
-            textOverallPercentage.setText(String.format("%d%%", progress));
-            
-            if (remainingAmount <= 0) {
-                textMonthlySavingsGoal.setText("Completed");
-                textMonthlySavingsGoal.setTextColor(getResources().getColor(R.color.income));
-            } else {
-                // Only show amount if it's valid
-                if (displayAmount > 0 && !Double.isInfinite(displayAmount) && !Double.isNaN(displayAmount)) {
-                    String amountText = "₱" + CircularProgressView.formatLargeNumber(displayAmount);
-                    if (allGoals != null && allGoals.stream().anyMatch(g -> !g.isCompleted() && g.getTargetDate().before(new Date()))) {
-                        amountText += " (Overdue)";
-                    }
-                    textMonthlySavingsGoal.setText(amountText);
-                } else {
-                    textMonthlySavingsGoal.setText("Set a goal");
+            return;
+        }
+        
+        // Find the latest target date among all goals
+        Date latestTargetDate = null;
+        for (SavingsGoal goal : goals) {
+            if (!goal.isCompleted() && goal.getTargetDate() != null) {
+                if (latestTargetDate == null || goal.getTargetDate().after(latestTargetDate)) {
+                    latestTargetDate = goal.getTargetDate();
                 }
-                textMonthlySavingsGoal.setTextColor(getResources().getColor(R.color.primary));
             }
         }
         
-        // Update period label with secondary text color
-        textGoalPeriodLabel.setText(periodLabel);
-        textGoalPeriodLabel.setTextColor(getResources().getColor(R.color.text_secondary));
+        // If no valid target date found, use default 1 month
+        if (latestTargetDate == null) {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.MONTH, 1);
+            latestTargetDate = cal.getTime();
+        }
         
+        // Calculate remaining amount
+        double remainingAmount = Math.max(0, targetSavings - currentSavings);
+        
+        // Get current date
+        Date currentDate = new Date();
+        
+        // Check if overall goal is overdue
+        boolean isOverdue = TimeUtils.isDateInPast(latestTargetDate);
+        
+        // Calculate periods remaining
+        double totalDays = TimeUtils.getPeriodsRemaining(currentDate, latestTargetDate, 0);
+        double totalWeeks = TimeUtils.getPeriodsRemaining(currentDate, latestTargetDate, 1);
+        double totalMonths = TimeUtils.getPeriodsRemaining(currentDate, latestTargetDate, 2);
+        
+        // Calculate amounts per period
+        double dailyAmount = TimeUtils.calculateAmountPerPeriod(remainingAmount, totalDays, isOverdue);
+        double weeklyAmount = TimeUtils.calculateAmountPerPeriod(remainingAmount, totalWeeks, isOverdue);
+        double monthlyAmount = TimeUtils.calculateAmountPerPeriod(remainingAmount, totalMonths, isOverdue);
+        
+        // Format and display the amounts
+        textMonthlySavingsGoal.setText(String.format("₱%s", 
+            CircularProgressView.formatLargeNumber(monthlyAmount)));
+        
+        // Log calculation details for debugging
         android.util.Log.d("SavingsFragment", String.format(
-            "Overall Progress Update:\n" +
-            "Current Savings: %.2f\n" +
-            "Target Savings: %.2f\n" +
-            "Progress: %d%%\n" +
+            "Overall Goal Calculation:\n" +
+            "Latest Target Date: %s\n" +
+            "Current Date: %s\n" +
             "Total Days: %.2f\n" +
             "Total Weeks: %.2f\n" +
             "Total Months: %.2f\n" +
-            "Is Exact Weeks: %b\n" +
-            "Is Exact Months: %b\n" +
-            "Display Amount: %.2f\n" +
-            "Period: %s\n" +
-            "Single Goal: %b\n" +
-            "Has Overdue Goals: %b",
-            currentSavings,
-            targetSavings,
-            progress,
+            "Target Amount: %.2f\n" +
+            "Current Amount: %.2f\n" +
+            "Remaining Amount: %.2f\n" +
+            "Daily Required: %.2f\n" +
+            "Weekly Required: %.2f\n" +
+            "Monthly Required: %.2f\n" +
+            "Is Overdue: %b",
+            new java.text.SimpleDateFormat("yyyy-MM-dd").format(latestTargetDate),
+            new java.text.SimpleDateFormat("yyyy-MM-dd").format(currentDate),
             totalDays,
             totalWeeks,
             totalMonths,
-            Math.abs(Math.round(totalWeeks) - totalWeeks) < 0.1,
-            Math.abs(Math.round(totalMonths) - totalMonths) < 0.1,
-            displayAmount,
-            periodLabel,
-            singleGoal != null,
-            allGoals != null && allGoals.stream().anyMatch(g -> !g.isCompleted() && g.getTargetDate().before(new Date()))
+            targetSavings,
+            currentSavings,
+            remainingAmount,
+            dailyAmount,
+            weeklyAmount,
+            monthlyAmount,
+            isOverdue
         ));
         
-        // Show confetti if progress increased significantly (25% or more)
+        // Show confetti if progress increased significantly
         if (Math.abs(progress - previousSavingsPercentage) >= 25 || 
             progress >= 100 && previousSavingsPercentage < 100) {
             showConfettiCelebration();
@@ -946,8 +802,7 @@ public class SavingsFragment extends Fragment {
         
         // Set up date picker
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, 6); // Default target date is 6 months from now
-        selectedTargetDate = calendar.getTime();
+        selectedTargetDate = calendar.getTime(); // Initialize with current date
         textTargetDate.setText(dateFormat.format(selectedTargetDate));
         
         textTargetDate.setOnClickListener(v -> {
@@ -1195,226 +1050,9 @@ public class SavingsFragment extends Fragment {
     }
     
     /**
-     * Show dialog to edit an existing savings goal
-     */
-    public void showEditSavingsGoalDialog(SavingsGoal goal) {
-        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_savings_goal, null);
-        
-        // Get references to dialog views
-        TextInputEditText editGoalName = dialogView.findViewById(R.id.edit_goal_name);
-        TextInputEditText editGoalDescription = dialogView.findViewById(R.id.edit_goal_description);
-        TextInputEditText editTargetAmount = dialogView.findViewById(R.id.edit_target_amount);
-        TextInputEditText editInitialAmount = dialogView.findViewById(R.id.edit_initial_amount);
-        TextView textTargetDate = dialogView.findViewById(R.id.text_target_date);
-        RadioGroup radioGroupPriority = dialogView.findViewById(R.id.radio_group_priority);
-        RadioButton radioLowPriority = dialogView.findViewById(R.id.radio_low_priority);
-        RadioButton radioMediumPriority = dialogView.findViewById(R.id.radio_medium_priority);
-        RadioButton radioHighPriority = dialogView.findViewById(R.id.radio_high_priority);
-        AutoCompleteTextView dropdownCategory = dialogView.findViewById(R.id.dropdown_category);
-        
-        // Setup dropdown options for category
-        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
-                requireContext(),
-                R.layout.item_dropdown,
-                savingsCategories
-        );
-        dropdownCategory.setAdapter(categoryAdapter);
-        
-        // Pre-fill the fields with existing goal data
-        editGoalName.setText(goal.getName());
-        editGoalDescription.setText(goal.getDescription());
-        editTargetAmount.setText(String.format(Locale.getDefault(), "%.2f", goal.getTargetAmount()));
-        editInitialAmount.setText(String.format(Locale.getDefault(), "%.2f", goal.getCurrentAmount()));
-        textTargetDate.setText(dateFormat.format(goal.getTargetDate()));
-        selectedTargetDate = goal.getTargetDate();
-        
-        // Set the priority radio button
-        switch (goal.getPriority()) {
-            case LOW:
-                radioLowPriority.setChecked(true);
-                break;
-            case HIGH:
-                radioHighPriority.setChecked(true);
-                break;
-            default:
-                radioMediumPriority.setChecked(true);
-                break;
-        }
-        
-        // Extract and set category if present in description
-        String existingCategory = extractCategory(goal.getDescription());
-        if (existingCategory != null && !existingCategory.isEmpty()) {
-            dropdownCategory.setText(existingCategory);
-        } else {
-            dropdownCategory.setText("General Savings");
-        }
-        
-        // Set up date picker
-        textTargetDate.setOnClickListener(v -> {
-            Calendar c = Calendar.getInstance();
-            if (selectedTargetDate != null) {
-                c.setTime(selectedTargetDate);
-            }
-            
-            DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    requireContext(),
-                    (view, year, monthOfYear, dayOfMonth) -> {
-                        Calendar selectedCalendar = Calendar.getInstance();
-                        selectedCalendar.set(year, monthOfYear, dayOfMonth);
-                        selectedTargetDate = selectedCalendar.getTime();
-                        textTargetDate.setText(dateFormat.format(selectedTargetDate));
-                    },
-                    c.get(Calendar.YEAR),
-                    c.get(Calendar.MONTH),
-                    c.get(Calendar.DAY_OF_MONTH)
-            );
-            
-            // Set minimum date to today
-            datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
-            datePickerDialog.show();
-        });
-        
-        // Create the dialog
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Edit Savings Goal")
-                .setView(dialogView)
-                .setPositiveButton("Save", null); // Set null to avoid auto-dismiss
-        
-        // Create dialog with builder
-        AlertDialog dialog = builder.create();
-        
-        // Set dialog to almost full width for better visibility of all fields
-        dialog.show();
-        
-        // Apply rounded corners and set width
-        if (dialog.getWindow() != null) {
-            int width = (int)(getResources().getDisplayMetrics().widthPixels * 0.95);
-            dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
-            dialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_dialog_background);
-        }
-        
-        // Override the positive button click to validate input before dismissing
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String name = editGoalName.getText().toString().trim();
-            String description = editGoalDescription.getText().toString().trim();
-            String targetAmountStr = editTargetAmount.getText().toString().trim();
-            String initialAmountStr = editInitialAmount.getText().toString().trim();
-            String selectedCategory = dropdownCategory.getText().toString().trim();
-            
-            // Get selected priority
-            SavingsGoal.Priority priority = SavingsGoal.Priority.MEDIUM; // Default medium
-            int selectedPriorityId = radioGroupPriority.getCheckedRadioButtonId();
-            
-            if (selectedPriorityId == R.id.radio_low_priority) {
-                priority = SavingsGoal.Priority.LOW;
-            } else if (selectedPriorityId == R.id.radio_high_priority) {
-                priority = SavingsGoal.Priority.HIGH;
-            }
-            
-            // Append category to description if not "General Savings"
-            if (!selectedCategory.equals("General Savings") && !description.contains("Category:")) {
-                description = (TextUtils.isEmpty(description) ? "" : description + "\n\n") + 
-                              "Category: " + selectedCategory;
-            }
-            
-            // Validate input
-            if (TextUtils.isEmpty(name)) {
-                editGoalName.setError("Please enter a goal name");
-                editGoalName.requestFocus();
-                return;
-            }
-            
-            if (TextUtils.isEmpty(targetAmountStr)) {
-                editTargetAmount.setError("Please enter a target amount");
-                editTargetAmount.requestFocus();
-                return;
-            }
-            
-            double targetAmount;
-            double initialAmount = 0.0;
-            
-            try {
-                targetAmount = Double.parseDouble(targetAmountStr);
-                if (targetAmount <= 0) {
-                    editTargetAmount.setError("Target amount must be greater than zero");
-                    editTargetAmount.requestFocus();
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                editTargetAmount.setError("Please enter a valid number");
-                editTargetAmount.requestFocus();
-                return;
-            }
-            
-            if (!TextUtils.isEmpty(initialAmountStr)) {
-                try {
-                    initialAmount = Double.parseDouble(initialAmountStr);
-                    if (initialAmount < 0) {
-                        editInitialAmount.setError("Initial amount cannot be negative");
-                        editInitialAmount.requestFocus();
-                        return;
-                    }
-                    
-                    if (initialAmount > targetAmount) {
-                        editInitialAmount.setError("Initial amount cannot exceed target amount");
-                        editInitialAmount.requestFocus();
-                        return;
-                    }
-                } catch (NumberFormatException e) {
-                    editInitialAmount.setError("Please enter a valid number");
-                    editInitialAmount.requestFocus();
-                    return;
-                }
-            }
-            
-            // Update the goal with new values
-            goal.setName(name);
-            goal.setDescription(description);
-            goal.setTargetAmount(targetAmount);
-            goal.setCurrentAmount(initialAmount);
-            goal.setTargetDate(selectedTargetDate);
-            goal.setPriority(priority);
-            
-            // Update the goal in the database
-            savingsViewModel.updateSavingsGoal(goal);
-            
-            // Show success message
-            ToastUtils.showSuccess(requireContext(), "Savings goal updated");
-            
-            // Dismiss the dialog
-            dialog.dismiss();
-        });
-    }
-    
-    /**
-     * Extract category from description
-     */
-    private String extractCategory(String description) {
-        if (description == null || description.isEmpty()) {
-            return null;
-        }
-        
-        // Look for "Category: X" in the description
-        int categoryIndex = description.indexOf("Category:");
-        if (categoryIndex != -1) {
-            int startIndex = categoryIndex + 10; // "Category: ".length()
-            int endIndex = description.indexOf("\n", startIndex);
-            if (endIndex == -1) {
-                endIndex = description.length();
-            }
-            
-            if (startIndex < endIndex && startIndex < description.length()) {
-                return description.substring(startIndex, endIndex).trim();
-            }
-        }
-        
-        return null;
-    }
-    
-    /**
      * Show dialog with goal details and options
      */
-    private void showOptionsMenu(SavingsGoal goal) {
+    private void showGoalDetailsDialog(SavingsGoal goal) {
         String[] options;
         
         if (goal.isCompleted()) {
@@ -1432,20 +1070,22 @@ public class SavingsFragment extends Fragment {
                             break;
                         case 1:  // Add Funds / Edit
                             if (goal.isCompleted()) {
-                                showEditSavingsGoalDialog(goal);
-                            } else {
-                                showAddFundsDialog(goal);
+                                // Edit goal
+                                // TODO: Implement edit goal functionality
+                                break;
                             }
+                            // Use the same Add Funds dialog as the button
+                            showAddFundsDialog(goal);
                             break;
                         case 2:  // Withdraw Funds / Delete
                             if (goal.isCompleted()) {
                                 confirmDeleteGoal(goal);
-                            } else {
-                                showWithdrawFundsDialog(goal);
+                                break;
                             }
+                            showWithdrawFundsDialog(goal);
                             break;
                         case 3:  // Edit Goal
-                            showEditSavingsGoalDialog(goal);
+                            // TODO: Implement edit goal functionality
                             break;
                         case 4:  // Mark as Completed
                             savingsViewModel.markGoalCompleted(goal);
