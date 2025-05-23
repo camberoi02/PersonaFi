@@ -4,20 +4,26 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.chip.Chip;
+import java.util.List;
 
 public class DashboardFragment extends Fragment {
     
     private TransactionViewModel transactionViewModel;
-    private RecyclerView recyclerView;
-    private TextView textStatsContent;
+    private RecyclerView categoryBreakdownRecycler;
+    private PieChart spendingChart;
+    private LineChart trendsChart;
+    private ChipGroup timePeriodChipGroup;
+    private Chip chipWeek, chipMonth, chipYear;
     
     @Nullable
     @Override
@@ -30,24 +36,33 @@ public class DashboardFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         
         // Initialize views
-        recyclerView = view.findViewById(R.id.recyclerview_categories);
-        textStatsContent = view.findViewById(R.id.text_stats_content);
+        categoryBreakdownRecycler = view.findViewById(R.id.category_breakdown_recycler);
+        spendingChart = view.findViewById(R.id.spending_chart);
+        trendsChart = view.findViewById(R.id.trends_chart);
+        timePeriodChipGroup = view.findViewById(R.id.time_period_chip_group);
+        chipWeek = view.findViewById(R.id.chip_week);
+        chipMonth = view.findViewById(R.id.chip_month);
+        chipYear = view.findViewById(R.id.chip_year);
         
         // Setup RecyclerView
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        categoryBreakdownRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         
         // Initialize ViewModel
         transactionViewModel = new ViewModelProvider(requireActivity()).get(TransactionViewModel.class);
         
         // Load dashboard data
         loadDashboardData();
+        
+        setupCharts();
+        setupRecyclerView();
+        setupChipGroup();
     }
     
     private void loadDashboardData() {
         // Observe transaction data from the ViewModel
         transactionViewModel.getAllTransactions().observe(getViewLifecycleOwner(), transactions -> {
             if (transactions == null || transactions.isEmpty()) {
-                textStatsContent.setText("No transactions to analyze. Add some transactions to see statistics.");
+                // TODO: Show empty state
                 return;
             }
             
@@ -63,23 +78,51 @@ public class DashboardFragment extends Fragment {
                 }
             }
             
-            double balance = totalIncome - totalExpenses;
-            double savingsRate = totalIncome > 0 ? (totalIncome - totalExpenses) / totalIncome * 100 : 0;
-            
-            // Display statistics
-            StringBuilder stats = new StringBuilder();
-            stats.append("Total Income: ").append(formatCurrency(totalIncome)).append("\n");
-            stats.append("Total Expenses: ").append(formatCurrency(totalExpenses)).append("\n");
-            stats.append("Current Balance: ").append(formatCurrency(balance)).append("\n");
-            stats.append("Savings Rate: ").append(String.format("%.1f%%", savingsRate)).append("\n");
-            
-            textStatsContent.setText(stats.toString());
-            
-            // TODO: Implement category breakdown and display in RecyclerView
+            // Update charts and recycler view with the data
+            updateCharts(totalIncome, totalExpenses, transactions);
+            updateCategoryBreakdown(transactions);
         });
     }
     
-    private String formatCurrency(double amount) {
-        return String.format("₱%.2f", amount);
+    private void updateCharts(double totalIncome, double totalExpenses, List<Transaction> transactions) {
+        // TODO: Update pie chart with spending categories
+        // TODO: Update line chart with spending trends
+    }
+    
+    private void updateCategoryBreakdown(List<Transaction> transactions) {
+        // TODO: Update category breakdown recycler view
+    }
+    
+    private void setupCharts() {
+        // Configure pie chart
+        spendingChart.setUsePercentValues(true);
+        spendingChart.getDescription().setEnabled(false);
+        spendingChart.setDrawHoleEnabled(true);
+        spendingChart.setHoleColor(android.graphics.Color.WHITE);
+        spendingChart.setTransparentCircleRadius(61f);
+        
+        // Configure line chart
+        trendsChart.getDescription().setEnabled(false);
+        trendsChart.setDrawGridBackground(false);
+        trendsChart.setDrawBorders(false);
+        trendsChart.getAxisLeft().setDrawGridLines(true);
+        trendsChart.getAxisRight().setEnabled(false);
+        trendsChart.getXAxis().setDrawGridLines(false);
+    }
+    
+    private void setupRecyclerView() {
+        // TODO: Setup RecyclerView with adapter for category breakdown
+    }
+    
+    private void setupChipGroup() {
+        timePeriodChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.chip_week) {
+                // TODO: Update data for weekly view
+            } else if (checkedId == R.id.chip_month) {
+                // TODO: Update data for monthly view
+            } else if (checkedId == R.id.chip_year) {
+                // TODO: Update data for yearly view
+            }
+        });
     }
 } 

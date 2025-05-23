@@ -8,11 +8,11 @@
         android:title="Home" />
     
     <item
-        android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_category"
+        android:id="@+id/navigation_transactions"
+        android:icon="@drawable/ic_peso"
         android:enabled="true"
         android:visible="true"
-        android:title="Dashboard" />
+        android:title="Transactions" />
     
     <!-- Empty item for center button -->
     <item
@@ -22,16 +22,16 @@
         android:visible="true" />
         
     <item
-        android:id="@+id/navigation_budgets"
-        android:icon="@drawable/ic_calendar"
+        android:id="@+id/navigation_game"
+        android:icon="@drawable/ic_game"
         android:enabled="true"
         android:visible="true"
-        android:title="Budgets" />
+        android:title="Game" />
     
     <item
-        android:id="@+id/navigation_transactions"
-        android:icon="@drawable/ic_peso"
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/ic_chart"
         android:enabled="true"
         android:visible="true"
-        android:title="Transactions" />
+        android:title="Dashboard" />
 </menu> 

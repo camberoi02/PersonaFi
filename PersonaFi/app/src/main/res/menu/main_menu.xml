@@ -5,19 +5,19 @@
     <item
         android:id="@+id/menu_dashboard"
         android:title="Dashboard"
-        android:icon="@android:drawable/ic_menu_info_details"
+        android:icon="@drawable/ic_chart"
         app:showAsAction="never" />
     
     <item
-        android:id="@+id/menu_budgets"
-        android:title="Budgets"
-        android:icon="@android:drawable/ic_menu_slideshow"
+        android:id="@+id/menu_transactions"
+        android:title="Transactions"
+        android:icon="@drawable/ic_peso"
         app:showAsAction="never" />
     
     <item
         android:id="@+id/menu_export"
         android:title="Export Data"
-        android:icon="@android:drawable/ic_menu_share"
+        android:icon="@drawable/ic_export"
         app:showAsAction="never" />
     
 </menu> 

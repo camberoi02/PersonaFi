@@ -108,4 +108,9 @@ public class TransactionRepository {
     public LiveData<String> getTopExpenseCategory() {
         return transactionDao.getTopExpenseCategory();
     }
+
+    // Get transactions by type
+    public LiveData<List<Transaction>> getTransactionsByType(Transaction.TransactionType type) {
+        return transactionDao.getTransactionsByType(type);
+    }
 }

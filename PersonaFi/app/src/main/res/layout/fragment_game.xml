@@ -11,37 +11,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Time Period Selector -->
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/time_period_chip_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_week"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Week"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_month"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Month"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_year"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Year"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
-        </com.google.android.material.chip.ChipGroup>
-
-        <!-- Spending Overview Card -->
+        <!-- User Level Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,46 +28,56 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Spending Overview"
+                    android:text="Your Level"
                     android:textSize="18sp"
                     android:textStyle="bold"/>
 
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/spending_chart"
+                <ProgressBar
+                    android:id="@+id/level_progress"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginTop="8dp"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:progress="75"/>
+
+                <TextView
+                    android:id="@+id/level_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Level 5 - 75% to next level"
+                    android:textSize="14sp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Category Breakdown -->
+        <!-- Achievements Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Category Breakdown"
+            android:text="Achievements"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/category_breakdown_recycler"
+            android:id="@+id/achievements_recycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Trends Section -->
+        <!-- Missions Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Spending Trends"
+            android:text="Active Missions"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/trends_chart"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/missions_recycler"
             android:layout_width="match_parent"
-            android:layout_height="200dp"/>
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView> 

@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private ProgressBar progressSpending;
     private ImageView imageBalanceIndicator;
+    private View homeContent;
+    private View fragmentContainer;
 
     // Activity result launcher for adding a transaction
     private final ActivityResultLauncher<Intent> addTransactionLauncher = registerForActivityResult(
@@ -77,182 +79,175 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        
-        // Handle edge to edge display
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        // Initialize views
-        recyclerView = findViewById(R.id.recyclerview_transactions);
-        emptyView = findViewById(R.id.empty_view);
-        textTotalIncome = findViewById(R.id.text_total_income);
-        textTotalExpenses = findViewById(R.id.text_total_expenses);
-        textBalance = findViewById(R.id.text_balance);
-        progressSpending = findViewById(R.id.progress_spending);
-        imageBalanceIndicator = findViewById(R.id.image_balance_indicator);
-        FloatingActionButton fabAddGoal = findViewById(R.id.fab_add_goal);
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-
-        // Setup currency formatter
-        currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("fil", "PH"));
-
-        // Setup RecyclerView
-        adapter = new TransactionAdapter();
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Setup ViewModel
-        transactionViewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
-
-        // Observe transactions
-        transactionViewModel.getAllTransactions().observe(this, transactions -> {
-            // Update RecyclerView
-            adapter.submitList(transactions);
+        try {
+            EdgeToEdge.enable(this);
+            setContentView(R.layout.activity_main);
             
-            // Show empty state if no transactions
-            if (transactions == null || transactions.isEmpty()) {
-                recyclerView.setVisibility(View.GONE);
-                emptyView.setVisibility(View.VISIBLE);
-            } else {
-                recyclerView.setVisibility(View.VISIBLE);
-                emptyView.setVisibility(View.GONE);
-            }
-        });
+            // Handle edge to edge display
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
 
-        // Observe total income
-        transactionViewModel.getTotalIncome().observe(this, totalIncome -> {
-            if (totalIncome != null) {
-                textTotalIncome.setText(currencyFormatter.format(totalIncome));
-                updateBalance();
-            } else {
-                textTotalIncome.setText(currencyFormatter.format(0));
-            }
-        });
+            // Initialize views
+            recyclerView = findViewById(R.id.recyclerview_transactions);
+            emptyView = findViewById(R.id.empty_view);
+            textTotalIncome = findViewById(R.id.text_total_income);
+            textTotalExpenses = findViewById(R.id.text_total_expenses);
+            textBalance = findViewById(R.id.text_balance);
+            progressSpending = findViewById(R.id.progress_spending);
+            imageBalanceIndicator = findViewById(R.id.image_balance_indicator);
+            FloatingActionButton fabAddGoal = findViewById(R.id.fab_add_goal);
+            bottomNavigationView = findViewById(R.id.bottom_navigation);
+            homeContent = findViewById(R.id.home_content);
+            fragmentContainer = findViewById(R.id.fragment_container);
 
-        // Observe total expenses
-        transactionViewModel.getTotalExpenses().observe(this, totalExpenses -> {
-            if (totalExpenses != null) {
-                textTotalExpenses.setText(currencyFormatter.format(totalExpenses));
-                updateBalance();
-            } else {
-                textTotalExpenses.setText(currencyFormatter.format(0));
-            }
-        });
+            // Setup currency formatter
+            currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("fil", "PH"));
 
-        // Setup floating action button for adding goals
-        fabAddGoal.setOnClickListener(view -> {
-            // Add click animation
-            android.view.animation.Animation pulseAnimation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fab_pulse);
-            view.startAnimation(pulseAnimation);
-            
-            // Get the current selected tab ID
-            int selectedItemId = bottomNavigationView.getSelectedItemId();
+            // Setup RecyclerView
+            adapter = new TransactionAdapter();
+            recyclerView.setAdapter(adapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-            // Perform different actions depending on the selected tab
-            if (selectedItemId == R.id.navigation_home) {
-                // Savings tab: Add new savings goal
-                Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                if (currentFragment instanceof SavingsFragment) {
-                    ((SavingsFragment) currentFragment).showAddSavingsGoalDialog();
+            // Setup ViewModel
+            transactionViewModel = new ViewModelProvider(this).get(TransactionViewModel.class);
+
+            // Observe transactions
+            transactionViewModel.getAllTransactions().observe(this, transactions -> {
+                // Update RecyclerView
+                adapter.submitList(transactions);
+                
+                // Show empty state if no transactions
+                if (transactions == null || transactions.isEmpty()) {
+                    recyclerView.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                } else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
                 }
-            } 
-            else if (selectedItemId == R.id.navigation_dashboard) {
-                // Dashboard tab: Open analytics or add category
-                Toast.makeText(MainActivity.this, "Add category feature coming soon", Toast.LENGTH_SHORT).show();
-            }
-            else if (selectedItemId == R.id.navigation_budgets) {
-                // Budgets tab: Add new budget
-                Toast.makeText(MainActivity.this, "Add budget feature coming soon", Toast.LENGTH_SHORT).show();
+            });
+
+            // Observe total income
+            transactionViewModel.getTotalIncome().observe(this, totalIncome -> {
+                if (totalIncome != null) {
+                    textTotalIncome.setText(currencyFormatter.format(totalIncome));
+                    updateBalance();
+                } else {
+                    textTotalIncome.setText(currencyFormatter.format(0));
+                }
+            });
+
+            // Observe total expenses
+            transactionViewModel.getTotalExpenses().observe(this, totalExpenses -> {
+                if (totalExpenses != null) {
+                    textTotalExpenses.setText(currencyFormatter.format(totalExpenses));
+                    updateBalance();
+                } else {
+                    textTotalExpenses.setText(currencyFormatter.format(0));
+                }
+            });
+
+            // Setup floating action button for adding goals
+            fabAddGoal.setOnClickListener(view -> {
+                // Add click animation
+                android.view.animation.Animation pulseAnimation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fab_pulse);
+                view.startAnimation(pulseAnimation);
+                
+                // Get the current selected tab ID
+                int selectedItemId = bottomNavigationView.getSelectedItemId();
+
+                // Perform different actions depending on the selected tab
+                if (selectedItemId == R.id.navigation_home) {
+                    // Home tab: Add new savings goal
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                    if (currentFragment instanceof SavingsFragment) {
+                        ((SavingsFragment) currentFragment).showAddSavingsGoalDialog();
+                    }
+                } 
+                else if (selectedItemId == R.id.navigation_dashboard) {
+                    // Dashboard tab: Open analytics or add category
+                    Toast.makeText(MainActivity.this, "Add category feature coming soon", Toast.LENGTH_SHORT).show();
+                }
+                else if (selectedItemId == R.id.navigation_transactions) {
+                    // Transactions tab: Add transaction
+                    Intent intent = new Intent(MainActivity.this, AddTransactionActivity.class);
+                    addTransactionLauncher.launch(intent);
+                }
+            });
+
+            // Setup bottom navigation
+            setupNavigation();
+
+            // Set active menu item
+            bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+
+            // Setup item click handler for editing transactions
+            adapter.setOnItemClickListener(transaction -> {
+                // TODO: Implement edit transaction functionality
+                Toast.makeText(MainActivity.this, "Edit transaction: " + transaction.getDescription(), Toast.LENGTH_SHORT).show();
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error initializing app: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void setupNavigation() {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int selectedItemId = item.getItemId();
+            
+            if (selectedItemId == R.id.navigation_home) {
+                showHomeFragment();
+                return true;
             }
             else if (selectedItemId == R.id.navigation_transactions) {
-                // Transactions tab: Add transaction
-                Intent intent = new Intent(MainActivity.this, AddTransactionActivity.class);
-                addTransactionLauncher.launch(intent);
-            }
-        });
-
-        // Setup bottom navigation
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            
-            // Check if the middle add goal item was clicked, which we want to ignore for navigation
-            if (itemId == R.id.navigation_add_goal) {
-                // Trigger the center button action without changing the selected tab
-                fabAddGoal.performClick();
-                // Return false to prevent selecting this item
-                return false;
-            }
-            
-            // Hide the home content (financial summary) by default
-            findViewById(R.id.home_content).setVisibility(View.GONE);
-            // Hide the fragment container by default
-            findViewById(R.id.fragment_container).setVisibility(View.GONE);
-            
-            // Never hide the add goal button, as it's part of the bottom navigation
-            
-            if (itemId == R.id.navigation_home) {
-                // Show savings fragment with a slight delay to prevent flickering during initial load
-                findViewById(R.id.fragment_container).setVisibility(View.VISIBLE);
-                
-                // Add slight delay before loading the fragment to avoid flickering
-                new android.os.Handler().postDelayed(() -> {
-                    loadFragment(new SavingsFragment());
-                }, 150); // Short delay to allow UI to stabilize
-                
-                return true;
-            } else if (itemId == R.id.navigation_dashboard) {
-                // Show dashboard fragment
-                loadFragment(new DashboardFragment());
-                findViewById(R.id.fragment_container).setVisibility(View.VISIBLE);
-                return true;
-            } else if (itemId == R.id.navigation_budgets) {
-                // Show budgets fragment
-                loadFragment(new BudgetsFragment());
-                findViewById(R.id.fragment_container).setVisibility(View.VISIBLE);
-                return true;
-            } else if (itemId == R.id.navigation_transactions) {
-                // Show home fragment and financial summary
-                // Show financial summary for transactions tab
-                findViewById(R.id.home_content).setVisibility(View.VISIBLE);
-                
-                // Load the HomeFragment into transactions_container
-                HomeFragment transactionsFragment = new HomeFragment();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.transactions_container, transactionsFragment)
-                        .commit();
-                
+                showTransactionsFragment();
                 return true;
             }
+            else if (selectedItemId == R.id.navigation_game) {
+                showGameFragment();
+                return true;
+            }
+            else if (selectedItemId == R.id.navigation_dashboard) {
+                showDashboardFragment();
+                return true;
+            }
+            
             return false;
-        });
-
-        // Set active menu item
-        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
-
-        // Setup item click handler for editing transactions
-        adapter.setOnItemClickListener(transaction -> {
-            // TODO: Implement edit transaction functionality
-            Toast.makeText(MainActivity.this, "Edit transaction: " + transaction.getDescription(), Toast.LENGTH_SHORT).show();
         });
     }
 
-    /**
-     * Loads a fragment into the fragment container
-     */
-    private void loadFragment(Fragment fragment) {
-        if (fragment instanceof HomeFragment) {
-            // For home fragment, don't load it into the main fragment container
-            // as we're handling it separately to resolve the layout issue
-            return;
-        }
-        
+    private void showHomeFragment() {
+        homeContent.setVisibility(View.GONE);
+        fragmentContainer.setVisibility(View.VISIBLE);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+                .replace(R.id.fragment_container, new SavingsFragment())
+                .commit();
+    }
+
+    private void showTransactionsFragment() {
+        homeContent.setVisibility(View.GONE);
+        fragmentContainer.setVisibility(View.VISIBLE);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new IncomeExpensesFragment())
+                .commit();
+    }
+
+    private void showGameFragment() {
+        homeContent.setVisibility(View.GONE);
+        fragmentContainer.setVisibility(View.VISIBLE);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new GameFragment())
+                .commit();
+    }
+
+    private void showDashboardFragment() {
+        homeContent.setVisibility(View.GONE);
+        fragmentContainer.setVisibility(View.VISIBLE);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new DashboardFragment())
                 .commit();
     }
 
@@ -317,9 +312,9 @@ public class MainActivity extends AppCompatActivity {
             // Navigate to Dashboard
             bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
             return true;
-        } else if (id == R.id.menu_budgets) {
-            // Navigate to Budgets
-            bottomNavigationView.setSelectedItemId(R.id.navigation_budgets);
+        } else if (id == R.id.menu_transactions) {
+            // Navigate to Transactions
+            bottomNavigationView.setSelectedItemId(R.id.navigation_transactions);
             return true;
         } else if (id == R.id.menu_export) {
             // Export data

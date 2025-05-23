@@ -10,7 +10,6 @@ import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.personifi.Budget;
-import com.example.personifi.DateConverter;
 import com.example.personifi.SavingsGoal;
 import com.example.personifi.Transaction;
 

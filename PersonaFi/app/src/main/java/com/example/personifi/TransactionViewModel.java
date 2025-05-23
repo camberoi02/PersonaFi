@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class TransactionViewModel extends AndroidViewModel {
 
-    private TransactionRepository repository;
+    private final TransactionRepository repository;
     private final LiveData<List<Transaction>> allTransactions;
     private final LiveData<List<Transaction>> allIncome;
     private final LiveData<List<Transaction>> allExpenses;
@@ -101,5 +101,10 @@ public class TransactionViewModel extends AndroidViewModel {
     // Get top expense category
     public LiveData<String> getTopExpenseCategory() {
         return repository.getTopExpenseCategory();
+    }
+
+    // Get transactions by type
+    public LiveData<List<Transaction>> getTransactionsByType(Transaction.TransactionType type) {
+        return repository.getTransactionsByType(type);
     }
 }
