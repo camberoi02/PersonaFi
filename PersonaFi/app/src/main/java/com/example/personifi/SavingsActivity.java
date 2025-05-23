@@ -64,7 +64,10 @@ public class SavingsActivity extends AppCompatActivity {
         // Setup toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
         
         // Initialize views
         recyclerViewAllGoals = findViewById(R.id.recyclerview_savings_goals);
@@ -73,7 +76,6 @@ public class SavingsActivity extends AppCompatActivity {
         textOverallProgress = findViewById(R.id.text_overall_progress);
         textCompletedCount = findViewById(R.id.text_completed_count);
         emptyView = findViewById(R.id.empty_view);
-        FloatingActionButton fabAddSavingsGoal = findViewById(R.id.fab_add_savings_goal);
         confettiView = findViewById(R.id.confetti_view);
         
         // Setup formatters
@@ -122,8 +124,18 @@ public class SavingsActivity extends AppCompatActivity {
         savingsViewModel.getTotalSavings().observe(this, this::updateProgressBar);
         savingsViewModel.getTotalSavingsTarget().observe(this, target -> updateProgressBar(null));
         
-        // Set click listeners
-        fabAddSavingsGoal.setOnClickListener(v -> showAddSavingsGoalDialog());
+        // Set up the fragment
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new SavingsFragment())
+                    .commit();
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
     
     /**

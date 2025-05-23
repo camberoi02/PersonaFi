@@ -188,16 +188,10 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
             
-            // Update the FAB icon based on the selected tab
-            updateFabIcon(itemId, fabAddGoal);
-            
             // Hide the home content (financial summary) by default
             findViewById(R.id.home_content).setVisibility(View.GONE);
             // Hide the fragment container by default
             findViewById(R.id.fragment_container).setVisibility(View.GONE);
-            // Control FAB visibility - only show on home tab
-            FloatingActionButton fab = findViewById(R.id.fab_add_transaction);
-            fab.setVisibility(itemId == R.id.navigation_home ? View.VISIBLE : View.GONE);
             
             // Never hide the add goal button, as it's part of the bottom navigation
             
@@ -240,51 +234,11 @@ public class MainActivity extends AppCompatActivity {
         // Set active menu item
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
 
-        // Update FAB icon based on the selected tab
-        updateFabIcon(R.id.navigation_home, fabAddGoal);
-
-        // Add listener to update FAB icon when tab changes
-        bottomNavigationView.setOnItemReselectedListener(item -> {
-            // Do nothing on reselection to prevent fragment refresh
-        });
-
         // Setup item click handler for editing transactions
         adapter.setOnItemClickListener(transaction -> {
             // TODO: Implement edit transaction functionality
             Toast.makeText(MainActivity.this, "Edit transaction: " + transaction.getDescription(), Toast.LENGTH_SHORT).show();
         });
-    }
-
-    /**
-     * Update the FAB icon based on the selected tab
-     */
-    private void updateFabIcon(int selectedItemId, FloatingActionButton fab) {
-        try {
-            // Set a default icon in case any of these drawable resources don't exist
-            fab.setImageResource(R.drawable.ic_add);
-            
-            // Update the label text in the navigation menu to match current function
-            Menu menu = bottomNavigationView.getMenu();
-            MenuItem addItem = menu.findItem(R.id.navigation_add_goal);
-            
-            // Try to set specific icons based on the tab
-            if (selectedItemId == R.id.navigation_home) {
-                fab.setImageResource(R.drawable.ic_add);
-                if (addItem != null) addItem.setTitle("Add Goal");
-            } else if (selectedItemId == R.id.navigation_dashboard) {
-                fab.setImageResource(R.drawable.ic_add);
-                if (addItem != null) addItem.setTitle("Add Category");
-            } else if (selectedItemId == R.id.navigation_budgets) {
-                fab.setImageResource(R.drawable.ic_add);
-                if (addItem != null) addItem.setTitle("Add Budget");
-            } else if (selectedItemId == R.id.navigation_transactions) {
-                fab.setImageResource(R.drawable.ic_add);
-                if (addItem != null) addItem.setTitle("Add Transaction");
-            }
-        } catch (Exception e) {
-            // If any issues with resources, default to the standard add icon
-            fab.setImageResource(android.R.drawable.ic_input_add);
-        }
     }
 
     /**

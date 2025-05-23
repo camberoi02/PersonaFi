@@ -760,21 +760,21 @@ public class SavingsGoalAdapter extends ListAdapter<SavingsGoal, SavingsGoalAdap
             
             // If goal is overdue, suggest completing it within a month
             if (isOverdue) {
-                switch (goalPeriodMode) {
-                    case 0: // Daily
+            switch (goalPeriodMode) {
+                case 0: // Daily
                         displayAmount = remainingAmount / 30; // Spread over 30 days
-                        periodLabel = "Daily";
-                        break;
-                    case 1: // Weekly
+                    periodLabel = "Daily";
+                    break;
+                case 1: // Weekly
                         displayAmount = remainingAmount / 4; // Spread over 4 weeks
-                        periodLabel = "Weekly";
-                        break;
-                    case 2: // Monthly (default)
-                    default:
+                    periodLabel = "Weekly";
+                    break;
+                case 2: // Monthly (default)
+                default:
                         displayAmount = remainingAmount; // Complete within a month
-                        periodLabel = "Monthly";
-                        break;
-                }
+                    periodLabel = "Monthly";
+                    break;
+            }
             } else {
                 switch (goalPeriodMode) {
                     case 0: // Daily
@@ -838,8 +838,8 @@ public class SavingsGoalAdapter extends ListAdapter<SavingsGoal, SavingsGoalAdap
             
             // Display amount with simple period label
             if (displayAmount > 0 && !Double.isInfinite(displayAmount) && !Double.isNaN(displayAmount)) {
-                String displayText = String.format("%s %s", formatCurrency(displayAmount), periodLabel);
-                textMonthlyRecommended.setText(displayText);
+            String displayText = String.format("%s %s", formatCurrency(displayAmount), periodLabel);
+            textMonthlyRecommended.setText(displayText);
                 textMonthlyRecommended.setTextColor(itemView.getContext().getResources().getColor(R.color.text_secondary));
             } else {
                 textMonthlyRecommended.setText("Set a goal");

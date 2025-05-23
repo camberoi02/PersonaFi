@@ -59,14 +59,16 @@ public class TimeUtils {
                 case 1: // Weekly
                     return remainingAmount / 4.0;  // Spread over 4 weeks
                 case 2: // Monthly
-                    return remainingAmount;        // Complete within a month
+                    return remainingAmount / 1.0;  // Complete within a month
                 default:
                     return remainingAmount;
             }
         }
         
         // For regular periods, simply divide remaining by total periods
-        return remainingAmount / Math.max(1, totalPeriods);
+        // Ensure we don't divide by zero and handle very small periods
+        double effectivePeriods = Math.max(1.0, totalPeriods);
+        return remainingAmount / effectivePeriods;
     }
     
     /**

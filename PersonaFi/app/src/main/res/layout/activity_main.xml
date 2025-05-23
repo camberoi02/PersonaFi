@@ -315,19 +315,6 @@
         app:labelVisibilityMode="selected"
         app:menu="@menu/bottom_navigation_menu" />
 
-    <!-- Floating action button for adding transactions -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_transaction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="84dp"
-        android:contentDescription="Add a new transaction"
-        app:tint="@color/white"
-        app:backgroundTint="@color/primary"
-        app:srcCompat="@android:drawable/ic_input_add" />
-
     <!-- Center Add Goal FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_goal"

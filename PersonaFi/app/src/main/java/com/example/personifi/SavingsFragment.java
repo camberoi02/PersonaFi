@@ -262,7 +262,8 @@ public class SavingsFragment extends Fragment {
         // Setup monthly savings layout click
         View layoutMonthlySavings = requireView().findViewById(R.id.layout_monthly_savings);
         layoutMonthlySavings.setOnClickListener(v -> {
-            goalPeriodMode = (goalPeriodMode + 1) % 3;
+            // Cycle through periods: Monthly (2) -> Weekly (1) -> Daily (0)
+            goalPeriodMode = (goalPeriodMode + 2) % 3; // This will cycle: 2->1->0->2
             savePreferences();
             updateOverallProgress();
         });
@@ -497,6 +498,12 @@ public class SavingsFragment extends Fragment {
         // Update progress bar with single animation to avoid flickering
         circularProgressOverallSavings.setProgress(progress);
         
+        // Update the percentage and progress text views
+        textOverallPercentage.setText(String.format("%d%%", progress));
+        textOverallProgress.setText(String.format("₱%s / ₱%s", 
+            CircularProgressView.formatLargeNumber(currentSavings),
+            CircularProgressView.formatLargeNumber(targetSavings)));
+
         // Get all savings goals to find the latest target date
         List<SavingsGoal> goals = savingsViewModel.getAllSavingsGoals().getValue();
         if (goals == null || goals.isEmpty()) {
@@ -505,74 +512,96 @@ public class SavingsFragment extends Fragment {
             textMonthlySavingsGoal.setTextColor(getResources().getColor(R.color.primary));
             return;
         }
-        
-        // Find the latest target date among all goals
-        Date latestTargetDate = null;
+
+        // Calculate total monthly amount needed across all active goals
+        double totalMonthlyAmount = 0;
+        boolean hasOverdueGoals = false;
+        Date currentDate = new Date();
+
         for (SavingsGoal goal : goals) {
-            if (!goal.isCompleted() && goal.getTargetDate() != null) {
-                if (latestTargetDate == null || goal.getTargetDate().after(latestTargetDate)) {
-                    latestTargetDate = goal.getTargetDate();
+            if (!goal.isCompleted()) {
+                // Get the goal's monthly amount using its own target date
+                double remainingAmount = goal.getRemainingAmount();
+                Date targetDate = goal.getTargetDate();
+                
+                if (targetDate != null) {
+                    boolean isOverdue = TimeUtils.isDateInPast(targetDate);
+                    if (isOverdue) {
+                        hasOverdueGoals = true;
+                    }
+                    
+                    // Calculate periods for this specific goal
+                    double totalMonths = TimeUtils.getPeriodsRemaining(currentDate, targetDate, 2);
+                    
+                    // Calculate monthly amount for this goal
+                    double monthlyAmount;
+                    if (isOverdue) {
+                        // If overdue, need to complete within a month
+                        monthlyAmount = remainingAmount;
+                    } else {
+                        // Check if it's an exact number of months
+                        boolean isExactMonths = Math.abs(Math.round(totalMonths) - totalMonths) < 0.1;
+                        
+                        if (isExactMonths) {
+                            // If it's exactly X months, divide target amount equally
+                            monthlyAmount = goal.getTargetAmount() / Math.round(totalMonths);
+                        } else {
+                            int fullMonths = (int) Math.ceil(totalMonths);
+                            if (fullMonths <= 1) {
+                                // If it's less than or exactly one month, show the full remaining amount
+                                monthlyAmount = remainingAmount;
+                            } else {
+                                // For regular cases, calculate monthly amount
+                                monthlyAmount = remainingAmount / totalMonths;
+                            }
+                        }
+                    }
+                    
+                    // Add this goal's monthly amount to the total
+                    totalMonthlyAmount += monthlyAmount;
                 }
             }
         }
-        
-        // If no valid target date found, use default 1 month
-        if (latestTargetDate == null) {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.MONTH, 1);
-            latestTargetDate = cal.getTime();
+
+        // Update period label based on current mode
+        String periodLabel;
+        double displayAmount;
+        switch (goalPeriodMode) {
+            case 0: // Daily
+                periodLabel = "Daily";
+                displayAmount = totalMonthlyAmount / 30.0; // Convert monthly to daily
+                break;
+            case 1: // Weekly
+                periodLabel = "Weekly";
+                displayAmount = totalMonthlyAmount / 4.0; // Convert monthly to weekly
+                break;
+            case 2: // Monthly
+            default:
+                periodLabel = "Monthly";
+                displayAmount = totalMonthlyAmount;
+                break;
         }
         
-        // Calculate remaining amount
-        double remainingAmount = Math.max(0, targetSavings - currentSavings);
-        
-        // Get current date
-        Date currentDate = new Date();
-        
-        // Check if overall goal is overdue
-        boolean isOverdue = TimeUtils.isDateInPast(latestTargetDate);
-        
-        // Calculate periods remaining
-        double totalDays = TimeUtils.getPeriodsRemaining(currentDate, latestTargetDate, 0);
-        double totalWeeks = TimeUtils.getPeriodsRemaining(currentDate, latestTargetDate, 1);
-        double totalMonths = TimeUtils.getPeriodsRemaining(currentDate, latestTargetDate, 2);
-        
-        // Calculate amounts per period
-        double dailyAmount = TimeUtils.calculateAmountPerPeriod(remainingAmount, totalDays, isOverdue);
-        double weeklyAmount = TimeUtils.calculateAmountPerPeriod(remainingAmount, totalWeeks, isOverdue);
-        double monthlyAmount = TimeUtils.calculateAmountPerPeriod(remainingAmount, totalMonths, isOverdue);
+        // Update the period label text
+        textGoalPeriodLabel.setText(periodLabel);
         
         // Format and display the amounts
         textMonthlySavingsGoal.setText(String.format("₱%s", 
-            CircularProgressView.formatLargeNumber(monthlyAmount)));
+            CircularProgressView.formatLargeNumber(displayAmount)));
         
         // Log calculation details for debugging
         android.util.Log.d("SavingsFragment", String.format(
             "Overall Goal Calculation:\n" +
-            "Latest Target Date: %s\n" +
-            "Current Date: %s\n" +
-            "Total Days: %.2f\n" +
-            "Total Weeks: %.2f\n" +
-            "Total Months: %.2f\n" +
-            "Target Amount: %.2f\n" +
-            "Current Amount: %.2f\n" +
-            "Remaining Amount: %.2f\n" +
-            "Daily Required: %.2f\n" +
-            "Weekly Required: %.2f\n" +
-            "Monthly Required: %.2f\n" +
-            "Is Overdue: %b",
-            new java.text.SimpleDateFormat("yyyy-MM-dd").format(latestTargetDate),
-            new java.text.SimpleDateFormat("yyyy-MM-dd").format(currentDate),
-            totalDays,
-            totalWeeks,
-            totalMonths,
-            targetSavings,
+            "Current Savings: %.2f\n" +
+            "Target Savings: %.2f\n" +
+            "Progress: %d%%\n" +
+            "Total Monthly Required: %.2f\n" +
+            "Has Overdue Goals: %b",
             currentSavings,
-            remainingAmount,
-            dailyAmount,
-            weeklyAmount,
-            monthlyAmount,
-            isOverdue
+            targetSavings,
+            progress,
+            totalMonthlyAmount,
+            hasOverdueGoals
         ));
         
         // Show confetti if progress increased significantly
