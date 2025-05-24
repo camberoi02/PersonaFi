@@ -7,7 +7,7 @@
     android:background="@color/background">
 
     <!-- Animated Shapes Background - moved to be first child with fitsSystemWindows -->
-    <com.example.personifi.AnimatedShapesView
+    <com.example.personafi.AnimatedShapesView
         android:id="@+id/animated_shapes_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -116,7 +116,7 @@
                             android:layout_marginBottom="-16dp">
 
                             <!-- Circular Progress View -->
-                            <com.example.personifi.CircularProgressView
+                            <com.example.personafi.CircularProgressView
                                 android:id="@+id/circular_progress_overall_savings"
                                 android:layout_width="240dp"
                                 android:layout_height="240dp"
@@ -283,7 +283,7 @@
                     </LinearLayout>
 
                     <!-- Confetti animation view for celebrations -->
-                    <com.example.personifi.ConfettiView
+                    <com.example.personafi.ConfettiView
                         android:id="@+id/confetti_view"
                         android:layout_width="match_parent"
                         android:layout_height="250dp"

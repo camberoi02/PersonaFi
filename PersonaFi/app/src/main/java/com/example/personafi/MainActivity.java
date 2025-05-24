@@ -1,4 +1,4 @@
-package com.example.personifi;
+package com.example.personafi;
 
 import android.os.Bundle;
 import android.view.Menu;
@@ -74,10 +74,6 @@ public class MainActivity extends AppCompatActivity {
                     android.content.Intent intent = new android.content.Intent(MainActivity.this, AddTransactionActivity.class);
                     startActivity(intent);
                 }
-                else if (selectedItemId == R.id.navigation_game) {
-                    // Game tab: Show message dialog
-                    showGameMessageDialog();
-                }
             });
 
         } catch (Exception e) {
@@ -133,24 +129,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new DashboardFragment())
                 .commit();
-    }
-
-    private void showGameMessageDialog() {
-        android.app.Dialog dialog = new android.app.Dialog(this);
-        dialog.setContentView(R.layout.dialog_game_message);
-        dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-        
-        // Set dialog width to 90% of screen width
-        android.view.WindowManager.LayoutParams layoutParams = new android.view.WindowManager.LayoutParams();
-        layoutParams.copyFrom(dialog.getWindow().getAttributes());
-        layoutParams.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
-        dialog.getWindow().setAttributes(layoutParams);
-
-        // Setup OK button
-        com.google.android.material.button.MaterialButton btnOk = dialog.findViewById(R.id.btn_ok);
-        btnOk.setOnClickListener(v -> dialog.dismiss());
-
-        dialog.show();
     }
 
     @Override

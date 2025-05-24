@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.personifi"
+    namespace = "com.example.personafi"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.personifi"
+        applicationId = "com.example.personafi"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

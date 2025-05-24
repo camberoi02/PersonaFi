@@ -1,4 +1,4 @@
-package com.example.personifi.utils;
+package com.example.personafi.utils;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 
-import com.example.personifi.R;
+import com.example.personafi.R;
 
 /**
  * Utility class for showing customized toast messages
@@ -46,21 +46,22 @@ public class ToastUtils {
         switch (type) {
             case SUCCESS:
                 cardView.setCardBackgroundColor(context.getResources().getColor(R.color.income));
+                iconView.setImageResource(R.drawable.ic_success);
                 break;
             case WARNING:
                 cardView.setCardBackgroundColor(context.getResources().getColor(R.color.expense));
+                iconView.setImageResource(R.drawable.ic_warning);
                 break;
             case ERROR:
                 cardView.setCardBackgroundColor(context.getResources().getColor(R.color.red));
+                iconView.setImageResource(R.drawable.ic_error);
                 break;
             case INFO:
             default:
                 cardView.setCardBackgroundColor(context.getResources().getColor(R.color.primary));
+                iconView.setImageResource(R.drawable.ic_info);
                 break;
         }
-        
-        // Use info icon for all types
-        iconView.setImageResource(R.drawable.ic_info);
 
         // Create and show the toast
         Toast toast = new Toast(context);
