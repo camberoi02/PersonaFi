@@ -1,6 +1,5 @@
 package com.example.personifi;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,37 +10,30 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-/**
- * Adapter for the RecyclerView to display transactions.
- */
 public class TransactionAdapter extends ListAdapter<Transaction, TransactionAdapter.TransactionViewHolder> {
-
     private OnItemClickListener listener;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+    private NumberFormat currencyFormatter;
+    private SimpleDateFormat dateFormatter;
 
     public TransactionAdapter() {
-        super(DIFF_CALLBACK);
+        super(new DiffUtil.ItemCallback<Transaction>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Transaction oldItem, @NonNull Transaction newItem) {
+                return oldItem.getId() == newItem.getId();
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull Transaction oldItem, @NonNull Transaction newItem) {
+                return oldItem.equals(newItem);
+            }
+        });
+        currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("fil", "PH"));
+        dateFormatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
     }
-
-    private static final DiffUtil.ItemCallback<Transaction> DIFF_CALLBACK = new DiffUtil.ItemCallback<Transaction>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull Transaction oldItem, @NonNull Transaction newItem) {
-            return oldItem.getId() == newItem.getId();
-        }
-
-        @Override
-        public boolean areContentsTheSame(@NonNull Transaction oldItem, @NonNull Transaction newItem) {
-            // Check if any fields have changed
-            return oldItem.getAmount() == newItem.getAmount() &&
-                    oldItem.getCategory().equals(newItem.getCategory()) &&
-                    oldItem.getDescription().equals(newItem.getDescription()) &&
-                    oldItem.getDate().equals(newItem.getDate()) &&
-                    oldItem.getType() == newItem.getType();
-        }
-    };
 
     @NonNull
     @Override
@@ -53,22 +45,30 @@ public class TransactionAdapter extends ListAdapter<Transaction, TransactionAdap
 
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
-        Transaction current = getItem(position);
-        holder.bind(current);
+        Transaction transaction = getItem(position);
+        holder.bind(transaction);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Transaction transaction);
     }
 
     class TransactionViewHolder extends RecyclerView.ViewHolder {
-        private final TextView amountTextView;
-        private final TextView categoryTextView;
-        private final TextView descriptionTextView;
-        private final TextView dateTextView;
+        private final TextView textDescription;
+        private final TextView textCategory;
+        private final TextView textAmount;
+        private final TextView textDate;
 
         public TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
-            amountTextView = itemView.findViewById(R.id.text_amount);
-            categoryTextView = itemView.findViewById(R.id.text_category);
-            descriptionTextView = itemView.findViewById(R.id.text_description);
-            dateTextView = itemView.findViewById(R.id.text_date);
+            textDescription = itemView.findViewById(R.id.text_description);
+            textCategory = itemView.findViewById(R.id.text_category);
+            textAmount = itemView.findViewById(R.id.text_amount);
+            textDate = itemView.findViewById(R.id.text_date);
 
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
@@ -79,25 +79,16 @@ public class TransactionAdapter extends ListAdapter<Transaction, TransactionAdap
         }
 
         public void bind(Transaction transaction) {
-            String amountPrefix = transaction.getType() == Transaction.TransactionType.INCOME ? "+ $" : "- $";
-            String amountStr = amountPrefix + String.format("%.2f", transaction.getAmount());
-            
-            amountTextView.setText(amountStr);
+            textDescription.setText(transaction.getDescription());
+            textCategory.setText(transaction.getCategory());
+            textAmount.setText(currencyFormatter.format(transaction.getAmount()));
+            textDate.setText(dateFormatter.format(transaction.getDate()));
+
             // Set text color based on transaction type
-            amountTextView.setTextColor(transaction.getType() == Transaction.TransactionType.INCOME ? 
-                    Color.parseColor("#4CAF50") : Color.parseColor("#F44336"));
-                    
-            categoryTextView.setText(transaction.getCategory());
-            descriptionTextView.setText(transaction.getDescription());
-            dateTextView.setText(dateFormat.format(transaction.getDate()));
+            int colorResId = transaction.getType() == Transaction.TransactionType.INCOME 
+                ? R.color.income 
+                : R.color.expense;
+            textAmount.setTextColor(itemView.getContext().getColor(colorResId));
         }
     }
-
-    public interface OnItemClickListener {
-        void onItemClick(Transaction transaction);
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
-}
+} 
