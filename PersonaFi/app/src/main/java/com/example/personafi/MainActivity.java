@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.personafi.dialogs.GameComingSoonDialog;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -73,6 +74,11 @@ public class MainActivity extends AppCompatActivity {
                     // Transactions tab: Add transaction
                     android.content.Intent intent = new android.content.Intent(MainActivity.this, AddTransactionActivity.class);
                     startActivity(intent);
+                }
+                else if (selectedItemId == R.id.navigation_game) {
+                    // Game tab: Show coming soon dialog
+                    GameComingSoonDialog dialog = new GameComingSoonDialog(this);
+                    dialog.show();
                 }
             });
 

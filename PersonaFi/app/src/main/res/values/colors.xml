@@ -66,4 +66,7 @@
     <color name="high_priority">#FF5252</color>
     <color name="medium_priority">#00BFA5</color>
     <color name="low_priority">#9E9E9E</color>
+    
+    <!-- New color for locked achievement background -->
+    <color name="locked_achievement">#9E9E9E</color>
 </resources>
