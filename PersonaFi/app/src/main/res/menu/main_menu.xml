@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <item
+        android:id="@+id/menu_dashboard"
+        android:title="Dashboard"
+        android:icon="@drawable/ic_chart"
+        app:showAsAction="never" />
+    
+    <item
+        android:id="@+id/menu_transactions"
+        android:title="Transactions"
+        android:icon="@drawable/ic_peso"
+        app:showAsAction="never" />
+    
+    <item
+        android:id="@+id/menu_export"
+        android:title="Export Data"
+        android:icon="@drawable/ic_export"
+        app:showAsAction="never" />
+    
+</menu> 
