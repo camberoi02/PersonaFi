@@ -19,8 +19,14 @@ import java.util.Locale;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.NumberKeyListener;
+import androidx.recyclerview.widget.RecyclerView;
+import android.content.DialogInterface;
 
 public class GoalDialog extends DialogFragment {
+    private static final String KEY_NAME = "goal_name";
+    private static final String KEY_AMOUNT = "goal_amount";
+    private static final String KEY_POSITION = "goal_position";
+    
     private TextInputLayout textFieldGoalNameLayout;
     private TextInputLayout textFieldTargetAmountLayout;
     private TextInputEditText editTextGoalName;
@@ -34,6 +40,23 @@ public class GoalDialog extends DialogFragment {
     private double targetAmount;
     private int position = -1;
     private boolean isEdit = false;
+
+    private String parseFormattedNumber(String input) {
+        if (input == null || input.isEmpty()) {
+            return "0";
+        }
+        // Remove all non-digit characters except decimal point
+        return input.replaceAll("[^\\d.]", "");
+    }
+
+    private double parseAmount(String input) {
+        try {
+            String cleanInput = parseFormattedNumber(input);
+            return Double.parseDouble(cleanInput);
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
 
     public interface OnGoalSetListener {
         void onGoalSet(String name, double targetAmount, int position);
@@ -57,6 +80,16 @@ public class GoalDialog extends DialogFragment {
 
     public void setOnGoalSetListener(OnGoalSetListener listener) {
         this.listener = listener;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (editTextGoalName != null && editTextTargetAmount != null) {
+            outState.putString(KEY_NAME, editTextGoalName.getText().toString());
+            outState.putString(KEY_AMOUNT, editTextTargetAmount.getText().toString());
+            outState.putInt(KEY_POSITION, position);
+        }
     }
 
     @Override
@@ -96,7 +129,10 @@ public class GoalDialog extends DialogFragment {
             "Set a target amount and track your progress");
         buttonSave.setText(isEdit ? "Update" : "Create Goal");
 
-        if (isEdit) {
+        if (savedInstanceState != null) {
+            editTextGoalName.setText(savedInstanceState.getString(KEY_NAME));
+            editTextTargetAmount.setText(savedInstanceState.getString(KEY_AMOUNT));
+        } else if (goalName != null && targetAmount > 0) {
             editTextGoalName.setText(goalName);
             editTextTargetAmount.setText(String.format(Locale.getDefault(), "%.2f", targetAmount));
         }
@@ -129,18 +165,20 @@ public class GoalDialog extends DialogFragment {
         });
 
         buttonSave.setOnClickListener(v -> {
-            if (validateInput()) {
+            if (isInputValid()) {
                 String name = editTextGoalName.getText().toString().trim();
-                String amountStr = NumberFormattingTextWatcher.parseAmount(editTextTargetAmount.getText().toString().trim());
-                double amount = Double.parseDouble(amountStr);
+                String amountStr = editTextTargetAmount.getText().toString().trim();
+                double amount = parseAmount(amountStr);
+                
                 if (listener != null) {
                     listener.onGoalSet(name, amount, position);
                 }
-                dismiss();
+                
+                dismissDialog();
             }
         });
 
-        buttonCancel.setOnClickListener(v -> dismiss());
+        buttonCancel.setOnClickListener(v -> dismissDialog());
 
         return view;
     }
@@ -159,14 +197,19 @@ public class GoalDialog extends DialogFragment {
         if (getDialog() != null && getDialog().getWindow() != null) {
             int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
             getDialog().getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+            getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            
+            // Set dialog to not be cancelable
+            getDialog().setCancelable(false);
+            getDialog().setCanceledOnTouchOutside(false);
         }
     }
 
-    private boolean validateInput() {
+    private boolean isInputValid() {
         boolean isValid = true;
 
         String name = editTextGoalName.getText().toString().trim();
-        String amountStr = NumberFormattingTextWatcher.parseAmount(editTextTargetAmount.getText().toString().trim());
+        String amountStr = editTextTargetAmount.getText().toString().trim();
 
         if (TextUtils.isEmpty(name)) {
             textFieldGoalNameLayout.setError("Please enter a goal name");
@@ -183,7 +226,7 @@ public class GoalDialog extends DialogFragment {
             isValid = false;
         } else {
             try {
-                double amount = Double.parseDouble(amountStr);
+                double amount = parseAmount(amountStr);
                 if (amount <= 0) {
                     textFieldTargetAmountLayout.setError("Amount must be greater than 0");
                     isValid = false;
@@ -200,5 +243,54 @@ public class GoalDialog extends DialogFragment {
         }
 
         return isValid;
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        cleanup();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cleanup();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        cleanup();
+    }
+
+    private void cleanup() {
+        // Clear the listener
+        listener = null;
+        
+        // Clear any saved state
+        if (getArguments() != null) {
+            getArguments().clear();
+        }
+        
+        // Clear references to views
+        textFieldGoalNameLayout = null;
+        textFieldTargetAmountLayout = null;
+        editTextGoalName = null;
+        editTextTargetAmount = null;
+        dialogTitle = null;
+        dialogSubtitle = null;
+        buttonSave = null;
+        buttonCancel = null;
+    }
+
+    private void dismissDialog() {
+        try {
+            if (isAdded() && getDialog() != null && getDialog().isShowing()) {
+                dismissAllowingStateLoss();
+                cleanup();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 } 

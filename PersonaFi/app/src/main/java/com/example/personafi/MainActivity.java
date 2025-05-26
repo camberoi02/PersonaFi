@@ -177,15 +177,20 @@ public class MainActivity extends AppCompatActivity implements SavingsGoalsFragm
     public void onGoalAddedOrProgressUpdated() {
         saveSavingsGoals();
         checkAllAchievements();
-        // Update the savings goals fragment if it exists
-        Fragment currentFragment = viewPagerAdapter.getFragmentAtPosition(0);
-        if (currentFragment instanceof SavingsGoalsFragment) {
-            ((SavingsGoalsFragment) currentFragment).refreshList();
-            // Force a layout refresh
-            if (currentFragment.getView() != null) {
-                currentFragment.getView().requestLayout();
+        
+        // Force reload the main view
+        runOnUiThread(() -> {
+            // Force reload the ViewPager
+            viewPager.setAdapter(null);
+            viewPager.setAdapter(viewPagerAdapter);
+            viewPager.setCurrentItem(0, false);
+            
+            // Force refresh the savings fragment
+            Fragment currentFragment = viewPagerAdapter.getFragmentAtPosition(0);
+            if (currentFragment instanceof SavingsGoalsFragment) {
+                ((SavingsGoalsFragment) currentFragment).refreshList();
             }
-        }
+        });
     }
 
     @Override
@@ -254,12 +259,14 @@ public class MainActivity extends AppCompatActivity implements SavingsGoalsFragm
         viewPagerAdapter = new ViewPagerAdapter(this);
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setUserInputEnabled(false); // Disable swipe between tabs
+        viewPager.setOffscreenPageLimit(3); // Keep all fragments in memory
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.navigation_savings) {
                 viewPager.setCurrentItem(0);
                 fabAddGoal.show();
+                refreshSavingsFragment();
                 return true;
             } else if (itemId == R.id.navigation_achievements) {
                 viewPager.setCurrentItem(1);
@@ -280,11 +287,7 @@ public class MainActivity extends AppCompatActivity implements SavingsGoalsFragm
                     case 0:
                         bottomNavigation.setSelectedItemId(R.id.navigation_savings);
                         fabAddGoal.show();
-                        // Refresh savings goals when returning to savings tab
-                        Fragment currentFragment = viewPagerAdapter.getFragmentAtPosition(0);
-                        if (currentFragment instanceof SavingsGoalsFragment) {
-                            ((SavingsGoalsFragment) currentFragment).refreshList();
-                        }
+                        refreshSavingsFragment();
                         break;
                     case 1:
                         bottomNavigation.setSelectedItemId(R.id.navigation_achievements);
@@ -299,16 +302,30 @@ public class MainActivity extends AppCompatActivity implements SavingsGoalsFragm
         };
         viewPager.registerOnPageChangeCallback(pageChangeCallback);
 
+        setupFabAddGoal();
+    }
+
+    private void refreshSavingsFragment() {
+        Fragment currentFragment = viewPagerAdapter.getFragmentAtPosition(0);
+        if (currentFragment instanceof SavingsGoalsFragment) {
+            ((SavingsGoalsFragment) currentFragment).refreshList();
+            if (currentFragment.getView() != null) {
+                currentFragment.getView().invalidate();
+                currentFragment.getView().requestLayout();
+            }
+        }
+    }
+
+    private void setupFabAddGoal() {
         fabAddGoal.setOnClickListener(view -> {
-            if (viewPager.getCurrentItem() == 0) { // We know it's the savings tab
+            if (viewPager.getCurrentItem() == 0) {
                 Fragment currentFragment = viewPagerAdapter.getFragmentAtPosition(0);
                 if (currentFragment instanceof SavingsGoalsFragment) {
                     ((SavingsGoalsFragment) currentFragment).showAddGoalDialog();
                 } else {
-                    // Get the fragment from the adapter directly
+                    // If fragment is not created yet, create and show it
                     Fragment fragment = viewPagerAdapter.createFragment(0);
                     if (fragment instanceof SavingsGoalsFragment) {
-                        // Ensure fragment is attached to the activity
                         getSupportFragmentManager()
                             .beginTransaction()
                             .add(fragment, "f0")

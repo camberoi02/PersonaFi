@@ -18,6 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.ArrayList;
 
 public class SavingsGoalAdapter extends RecyclerView.Adapter<SavingsGoalAdapter.ViewHolder> {
 
@@ -43,7 +44,11 @@ public class SavingsGoalAdapter extends RecyclerView.Adapter<SavingsGoalAdapter.
     }
 
     public void updateGoals(List<SavingsGoal> newGoals) {
-        this.savingsGoals = newGoals;
+        if (newGoals == null) {
+            this.savingsGoals = new ArrayList<>();
+        } else {
+            this.savingsGoals = new ArrayList<>(newGoals);
+        }
         notifyDataSetChanged();
     }
 
@@ -56,7 +61,12 @@ public class SavingsGoalAdapter extends RecyclerView.Adapter<SavingsGoalAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        if (position < 0 || position >= savingsGoals.size()) return;
+        
         SavingsGoal goal = savingsGoals.get(position);
+        if (goal == null) return;
+
+        // Set basic goal information
         holder.textViewGoalName.setText(goal.getName());
         
         // Format currency amounts with compact numbers
@@ -83,7 +93,6 @@ public class SavingsGoalAdapter extends RecyclerView.Adapter<SavingsGoalAdapter.
             holder.buttonAddProgress.setText("Goal Completed!");
             holder.buttonAddProgress.setBackgroundTintList(ColorStateList.valueOf(holder.itemView.getResources().getColor(R.color.primary_container, null)));
             holder.buttonAddProgress.setTextColor(holder.itemView.getResources().getColor(R.color.primary, null));
-            // Add a completion icon
             holder.buttonEditGoal.setImageResource(R.drawable.ic_check_circle);
             holder.buttonEditGoal.setImageTintList(ColorStateList.valueOf(holder.itemView.getResources().getColor(R.color.primary, null)));
         } else {
@@ -96,27 +105,23 @@ public class SavingsGoalAdapter extends RecyclerView.Adapter<SavingsGoalAdapter.
             holder.buttonAddProgress.setText("Add Progress");
             holder.buttonAddProgress.setBackgroundTintList(ColorStateList.valueOf(holder.itemView.getResources().getColor(R.color.primary, null)));
             holder.buttonAddProgress.setTextColor(holder.itemView.getResources().getColor(R.color.on_primary, null));
-            // Show edit icon
             holder.buttonEditGoal.setImageResource(R.drawable.ic_edit);
             holder.buttonEditGoal.setImageTintList(ColorStateList.valueOf(holder.itemView.getResources().getColor(R.color.primary, null)));
         }
 
+        // Set click listeners
         holder.buttonAddProgress.setOnClickListener(v -> {
-            if (!goal.isAchieved()) {  // Only allow adding progress if goal is not achieved
+            if (!goal.isAchieved()) {
                 AddProgressDialog dialog = AddProgressDialog.newInstance(goal.getName(), goal.getLastAddedAmount());
                 dialog.setOnProgressAddedListener(amount -> {
                     goal.setCurrentAmount(goal.getCurrentAmount() + amount);
-                    goal.setLastAddedAmount(amount);  // Store the last added amount
+                    goal.setLastAddedAmount(amount);
                     notifyItemChanged(position);
-                    
-                    // Update mission progress based on the amount added
                     updateMissionProgress(amount);
-                    
                     if (progressUpdatedListener != null) {
                         progressUpdatedListener.onProgressUpdated();
                     }
                     if (goal.isAchieved()) {
-                        // Show celebration toast
                         CustomToast.showSuccess(context, "🎉 " + goal.getName() + " achieved!");
                     }
                 });
@@ -125,12 +130,11 @@ public class SavingsGoalAdapter extends RecyclerView.Adapter<SavingsGoalAdapter.
         });
 
         holder.buttonEditGoal.setOnClickListener(v -> {
-            if (!goal.isAchieved()) {  // Only allow editing if goal is not achieved
+            if (!goal.isAchieved()) {
                 if (progressUpdatedListener != null) {
                     progressUpdatedListener.onEditGoal(goal, position);
                 }
             } else {
-                // Show error toast
                 CustomToast.showInfo(context, "Completed goals cannot be edited");
             }
         });
@@ -150,7 +154,7 @@ public class SavingsGoalAdapter extends RecyclerView.Adapter<SavingsGoalAdapter.
     }
 
     private void updateMissionProgress(double amount) {
-        if (missionManager != null) {
+        if (missionManager != null && amount > 0) {  // Only update if amount is greater than 0
             Mission dailyMission = missionManager.getCurrentDailyMission();
             if (dailyMission != null) {
                 // Check which mission it is and update accordingly
@@ -176,8 +180,29 @@ public class SavingsGoalAdapter extends RecyclerView.Adapter<SavingsGoalAdapter.
                             missionManager.updateMissionProgress(true, 1);
                         }
                         break;
-                    default:
-                        // For other missions like Goal Contributor or Multi-Goal
+                    case "Multi-Goal":
+                        // For Multi-Goal, we only increment by 1 since we're tracking number of goals
+                        missionManager.updateMissionProgress(true, 1);
+                        break;
+                    case "Goal Contributor":
+                        // Check if all goals have received an amount today
+                        boolean allGoalsUpdated = true;
+                        for (SavingsGoal goal : savingsGoals) {
+                            if (goal.getLastAddedAmount() <= 0) {
+                                allGoalsUpdated = false;
+                                break;
+                            }
+                        }
+                        if (allGoalsUpdated) {
+                            missionManager.updateMissionProgress(true, 1);
+                        }
+                        break;
+                    case "Progress Maker":
+                        // For Progress Maker, we only increment by 1 since we're tracking number of goals
+                        missionManager.updateMissionProgress(true, 1);
+                        break;
+                    case "Growth Spurt":
+                        // For Growth Spurt, we only increment by 1 since we're tracking number of goals
                         missionManager.updateMissionProgress(true, 1);
                         break;
                 }
@@ -201,8 +226,9 @@ public class SavingsGoalAdapter extends RecyclerView.Adapter<SavingsGoalAdapter.
                             missionManager.updateMissionProgress(false, (int) amount);
                         }
                         break;
-                    default:
-                        missionManager.updateMissionProgress(false, (int) amount);
+                    case "Weekly Growth":
+                        // For Weekly Growth, we only increment by 1 since we're tracking number of goals
+                        missionManager.updateMissionProgress(false, 1);
                         break;
                 }
             }
