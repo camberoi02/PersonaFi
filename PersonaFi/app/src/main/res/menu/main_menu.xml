@@ -3,21 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     
     <item
-        android:id="@+id/menu_dashboard"
-        android:title="Dashboard"
-        android:icon="@drawable/ic_chart"
+        android:id="@+id/menu_settings"
+        android:title="Settings"
         app:showAsAction="never" />
     
     <item
-        android:id="@+id/menu_transactions"
-        android:title="Transactions"
-        android:icon="@drawable/ic_peso"
+        android:id="@+id/menu_about"
+        android:title="About"
         app:showAsAction="never" />
-    
-    <item
-        android:id="@+id/menu_export"
-        android:title="Export Data"
-        android:icon="@drawable/ic_export"
-        app:showAsAction="never" />
-    
 </menu> 

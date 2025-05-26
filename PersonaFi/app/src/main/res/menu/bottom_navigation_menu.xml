@@ -1,37 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_home"
-        android:enabled="true"
-        android:visible="true"
-        android:title="Home" />
-    
+        android:id="@+id/navigation_savings"
+        android:icon="@drawable/ic_savings"
+        android:title="Savings" />
     <item
-        android:id="@+id/navigation_transactions"
-        android:icon="@drawable/ic_peso"
-        android:enabled="true"
-        android:visible="true"
-        android:title="Transactions" />
-    
-    <!-- Empty item for center button -->
+        android:id="@+id/navigation_achievements"
+        android:icon="@drawable/ic_achievement"
+        android:title="Missions" />
     <item
-        android:id="@+id/navigation_add_goal"
-        android:enabled="false"
-        android:title="Add"
-        android:visible="true" />
-        
-    <item
-        android:id="@+id/navigation_game"
-        android:icon="@drawable/ic_game"
-        android:enabled="true"
-        android:visible="true"
-        android:title="Game" />
-    
-    <item
-        android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_chart"
-        android:enabled="true"
-        android:visible="true"
-        android:title="Dashboard" />
+        android:id="@+id/navigation_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Profile" />
 </menu> 

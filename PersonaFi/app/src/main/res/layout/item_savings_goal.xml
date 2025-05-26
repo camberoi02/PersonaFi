@@ -1,311 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView 
+<androidx.cardview.widget.CardView 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/card_savings_goal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
-    android:layout_marginHorizontal="8dp"
-    app:cardElevation="3dp"
-    app:cardCornerRadius="16dp"
-    app:strokeWidth="0dp"
-    app:cardBackgroundColor="@android:color/transparent"
-    android:stateListAnimator="@animator/card_raise_animation">
-
-    <!-- Gradient Background -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/goal_card_gradient_background" />
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/surface"
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/spacing_medium">
+        android:padding="16dp"
+        android:background="@color/surface">
 
-        <!-- Top Section: Category chip, Goal Name, Progress Text -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
-
-            <!-- Goal category chip -->
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_goal_category"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
-                app:chipBackgroundColor="#E8F0FE"
-                app:chipMinHeight="24dp"
-                app:chipStrokeColor="@color/primary"
-                app:chipStrokeWidth="0.5dp"
-                tools:text="Travel" />
-
-            <!-- Progress Badge -->
-            <ImageView
-                android:id="@+id/image_more_details"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_more_details"
-                android:tint="@color/primary"
-                android:padding="8dp"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <!-- Achievement sparkle icon -->
-            <ImageView
-                android:id="@+id/image_achieved"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_toStartOf="@id/image_more_details"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="6dp"
-                android:src="@drawable/sparkle_shape"
-                android:visibility="gone" />
-        </RelativeLayout>
-
-        <!-- Goal Name with Priority Color Accent -->
+        <!-- Header section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
-
-            <View
-                android:id="@+id/priority_indicator"
-                android:layout_width="4dp"
-                android:layout_height="match_parent"
-                android:background="@color/primary"
-                android:layout_marginEnd="8dp"/>
+            android:layout_marginBottom="16dp">
 
             <TextView
-                android:id="@+id/text_goal_name"
-                android:layout_width="match_parent"
+                android:id="@+id/textViewGoalName"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
+                android:layout_weight="1"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="@color/on_surface"
                 android:maxLines="2"
                 android:ellipsize="end"
-                tools:text="New Laptop - Gaming Series" />
-        </LinearLayout>
+                tools:text="New Car Fund"/>
 
-        <!-- Progress Bar with Animated Indicator -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:id="@+id/text_goal_progress_above_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginBottom="4dp"
-                android:textColor="@color/primary_dark"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                tools:text="65%" />
-
-            <ProgressBar
-                android:id="@+id/progress_goal"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:progressTint="@color/primary"
-                android:progressBackgroundTint="#E0E0E0"
-                android:max="100"
-                android:layout_marginTop="20dp"
-                tools:progress="65" />
-
-            <!-- Animated dot indicator for active goals -->
-            <View
-                android:id="@+id/progress_indicator_dot"
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:background="@drawable/progress_dot_shape"
-                android:layout_gravity="center_vertical"
-                android:layout_marginTop="20dp"
-                android:visibility="gone"/>
-        </FrameLayout>
-
-        <!-- Amount Text with more visual separation -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/amount_info_background"
-            android:padding="10dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Saved"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_secondary" />
-
-                <TextView
-                    android:id="@+id/text_goal_current_amount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="17sp"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    tools:text="₱15K" />
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_arrow_right"
-                android:layout_gravity="center"
-                android:tint="@color/text_secondary"
-                android:alpha="0.5"/>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Target"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_secondary" />
-
-                <TextView
-                    android:id="@+id/text_goal_target_amount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="17sp"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    tools:text="₱50K" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Information Section -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
-
-            <!-- Target Date -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/ic_calendar"
-                    android:tint="@color/text_secondary"
-                    android:layout_marginEnd="4dp"/>
-
-                <TextView
-                    android:id="@+id/text_target_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="13sp"
-                    android:textColor="@color/text_primary"
-                    tools:text="Dec 15, 2023" />
-            </LinearLayout>
-
-            <!-- Monthly Recommendation -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:gravity="center_vertical|end">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/ic_peso"
-                    android:tint="@color/text_secondary"
-                    android:layout_marginEnd="4dp"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/text_monthly_recommended"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:textSize="13sp"
-                    android:textColor="@color/text_primary"
-                    android:textStyle="bold"
-                    android:minWidth="140dp"
-                    android:maxWidth="160dp"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
-                    android:backgroundTint="#F5F5F5"
-                    app:rippleColor="@color/ripple_color"
-                    app:cornerRadius="18dp"
-                    tools:text="2.5K Monthly" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Action Buttons with updated style -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <!-- Add Funds Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_add_funds"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="Add Funds"
-                android:textColor="@color/primary"
-                app:icon="@drawable/ic_peso"
-                app:iconTint="@color/primary"
-                app:strokeColor="@color/primary"
-                app:cornerRadius="24dp"
-                android:elevation="0dp"
-                app:rippleColor="@color/primary_light" />
-
-            <!-- View Details Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_view_details"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
+            <ImageButton
+                android:id="@+id/buttonEditGoal"
+                android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="8dp"
-                android:text="Details"
-                android:textColor="@color/text_secondary"
-                app:iconTint="@color/text_secondary"
-                app:rippleColor="@color/ripple_color" />
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_edit"
+                android:tint="@color/primary"
+                android:padding="12dp"
+                android:contentDescription="Edit goal"/>
+
         </LinearLayout>
+
+        <!-- Progress section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/textViewGoalProgress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    android:textColor="@color/on_surface"
+                    tools:text="₱5,000 / ₱10,000"/>
+
+                <TextView
+                    android:id="@+id/textViewPercentage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold"
+                    tools:text="50%"/>
+
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBarGoal"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:progressTint="@color/primary"
+                android:progressBackgroundTint="@color/progress_background"
+                android:minHeight="8dp"/>
+
+        </LinearLayout>
+
+        <!-- Actions section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/buttonDeleteGoal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:textColor="@color/error"/>
+
+            <Button
+                android:id="@+id/buttonAddProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Progress"
+                android:textColor="@color/on_primary"
+                android:backgroundTint="@color/primary"
+                style="@style/Widget.MaterialComponents.Button"/>
+
+        </LinearLayout>
+
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView> 
+
+</androidx.cardview.widget.CardView> 

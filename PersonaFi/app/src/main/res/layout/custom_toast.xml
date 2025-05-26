@@ -1,38 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/toast_container"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_margin="8dp"
-    app:cardBackgroundColor="@color/primary"
-    app:cardCornerRadius="16dp"
+    android:layout_margin="16dp"
+    app:cardBackgroundColor="@color/surface"
+    app:cardCornerRadius="12dp"
     app:cardElevation="8dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingTop="10dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="10dp">
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="16dp">
 
         <ImageView
-            android:id="@+id/toast_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="12dp"
-            android:contentDescription="Toast icon"
-            android:src="@drawable/ic_info" />
+            android:id="@+id/toastIcon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone" />
 
         <TextView
-            android:id="@+id/toast_text"
+            android:id="@+id/toastMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textSize="16sp"
+            android:textColor="@color/on_surface" />
+
     </LinearLayout>
+
 </androidx.cardview.widget.CardView> 

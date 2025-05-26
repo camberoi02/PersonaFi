@@ -1,72 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base colors -->
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="red">#F44336</color>
-    
-    <!-- Theme colors - refined green/teal palette -->
-    <color name="primary">#00BFA5</color>
-    <color name="primary_dark">#008E76</color>
-    <color name="primary_light">#B2DFDB</color>
-    <color name="accent">#FF5252</color>
-    <color name="accent_light">#FFCCBC</color>
-    
-    <!-- Status colors -->
-    <color name="success">#00C853</color>
-    <color name="error">#FF5252</color>
-    
-    <!-- Text colors - improved contrast -->
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#616161</color>
-    <color name="text_hint">#9E9E9E</color>
-    <color name="text_disabled">#BDBDBD</color>
-    
-    <!-- UI colors - enhanced with subtle tones -->
-    <color name="background">#F5F5F5</color>
+    <!-- Primary colors -->
+    <color name="primary">#2196F3</color>
+    <color name="primary_variant">#1976D2</color>
+    <color name="primary_container">#E3F2FD</color>
+    <color name="on_primary_container">#0D47A1</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <!-- Secondary colors -->
+    <color name="secondary">#64B5F6</color>
+    <color name="secondary_variant">#42A5F5</color>
+    <color name="secondary_container">#E3F2FD</color>
+    <color name="on_secondary">#000000</color>
+
+    <!-- Background colors -->
+    <color name="background">#FFFFFF</color>
+    <color name="on_background">#1A1A1A</color>
     <color name="surface">#FFFFFF</color>
-    <color name="card_background">#FFFFFF</color>
-    <color name="divider">#E0E0E0</color>
-    <color name="shadow">#33000000</color>
-    <color name="scrim">#52000000</color>
-    <color name="input_background">#F7F7F7</color>
-    <color name="shimmer_background">#EEEEEE</color>
+    <color name="surface_variant">#F5F5F5</color>
+    <color name="surface_container_highest">#EEEEEE</color>
+    <color name="on_surface">#1A1A1A</color>
+    <color name="on_surface_variant">#757575</color>
+
+    <!-- Error colors -->
+    <color name="error">#B00020</color>
+    <color name="error_container">#FFEBEE</color>
+    <color name="on_error">#FFFFFF</color>
+
+    <!-- Navigation colors -->
+    <color name="nav_background">#FFFFFF</color>
+    <color name="nav_selected">#2196F3</color>
+    <color name="nav_unselected">#757575</color>
+    <color name="nav_ripple">#E3F2FD</color>
+
+    <!-- Other colors -->
     <color name="outline">#E0E0E0</color>
-    <color name="search_background">#F5F7F9</color>
-    
-    <!-- Financial colors - more sophisticated palette -->
-    <color name="income">#00C853</color>
-    <color name="income_light">#B9F6CA</color>
-    <color name="expense">#FF5252</color>
-    <color name="expense_light">#FFCDD2</color>
-    <color name="budget_ok">#00C853</color>
-    <color name="budget_warning">#FFD600</color>
-    <color name="budget_over">#FF5252</color>
-    
-    <!-- Category colors for visualization -->
-    <color name="category_food">#7B1FA2</color>
-    <color name="category_transport">#1976D2</color>
-    <color name="category_shopping">#F57C00</color>
-    <color name="category_utilities">#0097A7</color>
-    <color name="category_entertainment">#D32F2F</color>
-    <color name="category_health">#388E3C</color>
-    <color name="category_education">#303F9F</color>
-    <color name="category_other">#5D4037</color>
-    
-    <!-- Gradient colors -->
-    <color name="gradient_start">#00BFA5</color>
-    <color name="gradient_end">#64FFDA</color>
-    <color name="gradient_expense_start">#FF5252</color>
-    <color name="gradient_expense_end">#FF8A80</color>
-    <color name="gradient_income_start">#00C853</color>
-    <color name="gradient_income_end">#69F0AE</color>
-    <color name="ripple_color">#1F000000</color>
-    
-    <!-- Priority colors -->
-    <color name="high_priority">#FF5252</color>
-    <color name="medium_priority">#00BFA5</color>
-    <color name="low_priority">#9E9E9E</color>
-    
-    <!-- New color for locked achievement background -->
-    <color name="locked_achievement">#9E9E9E</color>
+    <color name="progress_background">#E3F2FD</color>
+
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1976D2</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccentDark">#F50057</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>
